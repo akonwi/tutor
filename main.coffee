@@ -11,13 +11,28 @@ class Router
   # @params page string name of page to visit
   # @params args optional arguments used by methods as needed
   go: (page, args...) ->
-    this[page]?(args) || window.alert 'no dice'
+    if this[page]?
+      this[page]?(args)
+    else
+      @home()
 
   home: ->
-    $('#container').html new HomeView().render().el
+    @render new HomeView()
+
+  render: (view) ->
+    App.container.show view
 
 class HomeView extends Marionette.Layout
   template: Handlebars.compile $('#home-view').html()
 
-app = new Router()
-app.go 'home'
+global.App = new Marionette.Application
+App.addRegions
+  container: '#container'
+
+App.addInitializer (options) ->
+  App.router = new Router()
+
+App.on 'initialize:after', ->
+  @router.go 'home'
+
+App.start()
