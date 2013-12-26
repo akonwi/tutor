@@ -30,7 +30,7 @@ App.addRegions
   container: '#container'
 
 App.addInitializer (options) ->
-  App.router = new Router()
+  @router = new Router()
 
 App.on 'initialize:after', ->
   @router.go 'home'
