@@ -1,0 +1,8 @@
+{
+  "name": "Tutor",
+  "main": "index.html",
+  "window": {
+    "toolbar": true,
+    "title": "Tutor"
+  }
+}
