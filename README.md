@@ -8,7 +8,7 @@ This was originally a ruby app built with shoes4 for studying vocab in french bu
 
 (This runs as a desktop app in [node-webkit](http:github.com/rogerwang/node-webkit))
 
-First, download and install the pre-built binaries and then use the 'node-webkit' script to run the '.nw' zip. There are more details in the wiki of the project.
+First, download and install the pre-built binaries. Then zip the contents into a node-webkit executable using `zip -r app.nw *`. And then use the 'node-webkit' script from downloaded binaries to run app.nw with `/path/to/node-webkit app.nw`. There are more details in the wiki of the project.
 
 ## Contributing
 
