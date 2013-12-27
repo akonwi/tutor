@@ -25,8 +25,20 @@
   <body>
     <div id="container">
       <script id='home-view' type='handlebars'>
-        <h1 class="ui header">Tutor</h1>
-        <p>Let's Study</p>
+        <div class="ui huge center aligned header">Tutor</div>
+        <div class="ui large center aligned header">Let's Study!</div>
+        <div class="ui center aligned two column stackable grid">
+          <div class="column">
+            <div id="study-button" class="ui button">Study</div>   
+          </div> 
+          <div class="column">
+            <div id="add-words-button" class="ui button">Add Words</div>   
+          </div> 
+        </div>
+      </script>
+
+      <script id='add-words-view' type="handlebars">
+        <div class="ui huge center aligned header">Add Words</div> 
       </script>
     </div>
   </body>
