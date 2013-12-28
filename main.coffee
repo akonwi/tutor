@@ -40,10 +40,32 @@ class AddWordsView extends Marionette.Layout
 
   render: ->
     @$el.html @template()
-
-    # initialize the dropdown inside this template
-    @$el.find('.ui.selection.dropdown').dropdown()
+    @initialize_form()
     this
+
+  initialize_form: ->
+    rules =
+      word:
+        identifier: 'word'
+        rules: [
+          type: 'empty'
+          prompt: "Can't have a blank entry"
+        ]
+      definition:
+        identifier: 'definition'
+        rules: [
+          type: 'empty'
+          prompt: 'Need a definition'
+        ]
+
+    @$el.find('.ui.selection.dropdown').dropdown()
+    # apply validation rules
+    @$el.find('.ui.form').form rules, inline: true, on: 'blur'
+    # TODO:
+    #   $(form).on 'submit', ->
+    #     check $(dropdown).getValue()
+    #       show error popup if value is empty
+    #       do nothing if value is valid
 
 global.App = new Marionette.Application
 App.addRegions
