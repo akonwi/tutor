@@ -38,6 +38,13 @@ class HomeView extends Marionette.Layout
 class AddWordsView extends Marionette.Layout
   template: Handlebars.compile $('#add-words-view').html()
 
+  render: ->
+    @$el.html @template()
+
+    # initialize the dropdown inside this template
+    @$el.find('.ui.selection.dropdown').dropdown()
+    this
+
 global.App = new Marionette.Application
 App.addRegions
   container: '#container'

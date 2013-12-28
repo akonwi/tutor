@@ -39,6 +39,38 @@
 
       <script id='add-words-view' type="handlebars">
         <div class="ui huge center aligned header">Add Words</div> 
+        <div class="ui center aligned three column grid">
+        <!--In order to center-align a column right now, I'm using two spacer columns on each side-->
+          <div class="column"></div>
+          <div class="column">
+            <div class="ui form segment">
+              <div class="field">
+                <div class="ui selection dropdown">
+                  <input type="hidden" name="type">
+                  <div class="default text">Type</div>
+                  <i class="dropdown icon"></i>
+                  <div class="menu ui transition hidden">
+                    <div class="item" data-value="verb">Verb</div>
+                    <div class="item" data-value="noun">Noun</div>
+                    <div class="item" data-value="adjective">Adjective</div>
+                    <div class="item" data-value="stuff">Stuff</div>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui input">
+                  <input id="word-input" type="text" placeholder="Word"> 
+                </div> 
+              </div>
+              <div class="field">
+                <div class="ui input">
+                  <input id="word-definition" type="text" placeholder="Definition"> 
+                </div> 
+              </div>
+            </div>
+          </div>
+          <div class="column"></div>
+        </div>
       </script>
     </div>
   </body>
