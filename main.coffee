@@ -48,7 +48,7 @@ class AddWordsView extends Marionette.Layout
       type:
         identifier: 'type'
         rules: [
-          type: 'selected'
+          type: 'empty'
           prompt: 'Need a type'
         ]
       word:
@@ -64,7 +64,8 @@ class AddWordsView extends Marionette.Layout
           prompt: 'Need a definition'
         ]
 
-    $.fn.form.settings.rules.selected = (value) ->
+    # Overriding the default 'empty' rule for form validation
+    $.fn.form.settings.rules.empty = (value) ->
       not _.isEmpty value
 
     dropdown = @$el.find('.ui.selection.dropdown')
@@ -74,14 +75,14 @@ class AddWordsView extends Marionette.Layout
     form = @$el.find('.ui.form')
     form.form(rules, inline: true, on: 'blur')
 
-    # TODO:
-    #   $(form).on 'submit', ->
-    #     check $(dropdown).getValue()
-    #       show error popup if value is empty
-    #       do nothing if value is valid
-    #form.form 'setting', onSuccess: ->
-    #  if not _.isString dropdown.dropdown('get value')
-
+    # handle on success submission
+    form.form 'setting',
+      onSuccess: ->
+        # TODO: Create word model and database
+        word = {}
+        word.type = dropdown.dropdown 'get value'
+        word.word = form.form('get field', 'word').val()
+        word.definition = form.form('get field', 'definition').val()
 
 global.App = new Marionette.Application
 App.addRegions

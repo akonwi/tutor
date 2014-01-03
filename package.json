@@ -4,5 +4,9 @@
   "window": {
     "toolbar": true,
     "title": "Tutor"
+  },
+  "dependencies": {
+    "coffee-script": "*",
+    "underscore": "*"
   }
 }
