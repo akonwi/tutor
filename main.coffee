@@ -1,9 +1,3 @@
-global.Backbone = window.Backbone
-global.Marionette = window.Marionette
-global.Handlebars = window.Handlebars
-global.$ = window.jQuery
-global._ = window._
-
 # Router is going to do what Backbone's router does but because node-webkit
 #   loads each html file, this router will skip url paths entirely and
 #   just use functions directly(kind of a rails-y DSL). These functions will
