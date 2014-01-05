@@ -1,3 +1,7 @@
+WordModule = require('./libs/word')
+Word = WordModule.model
+Words = WordModule.collection
+
 # Router is going to do what Backbone's router does but because node-webkit
 #   loads each html file, this router will skip url paths entirely and
 #   just use functions directly(kind of a rails-y DSL). These functions will
@@ -73,10 +77,12 @@ class AddWordsView extends Marionette.Layout
     form.form 'setting',
       onSuccess: ->
         # TODO: Create word model and database
-        word = {}
-        word.type = dropdown.dropdown 'get value'
-        word.word = form.form('get field', 'word').val()
-        word.definition = form.form('get field', 'definition').val()
+        attr = {}
+        attr.type = dropdown.dropdown 'get value'
+        attr.word = form.form('get field', 'word').val()
+        attr.definition = form.form('get field', 'definition').val()
+
+        word = new Word(attr)
 
 global.App = new Marionette.Application
 App.addRegions
