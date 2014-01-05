@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "coffee-script": "*",
-    "underscore": "*"
+    "nedb": "~0.9.3"
   }
 }
