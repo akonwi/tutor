@@ -1,5 +1,5 @@
 class Word extends Backbone.Model
-  idAttribute: 'word'
+  #idAttribute: 'word'
 
 class Words extends Backbone.Collection
   model: Word

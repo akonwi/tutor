@@ -1,12 +1,7 @@
-path = require 'path'
 Datastore = require 'nedb'
 WordModule = require('./libs/word')
 Word = WordModule.model
 Words = WordModule.collection
-
-db = new Datastore
-  filename: path.join(require('nw.gui').App.dataPath, 'words.db')
-  autoload: true
 
 # Router is going to do what Backbone's router does but because node-webkit
 #   loads each html file, this router will skip url paths entirely and
@@ -89,6 +84,7 @@ class AddWordsView extends Marionette.Layout
         attr.definition = form.form('get field', 'definition').val()
 
         word = new Word(attr)
+        word.save()
 
 global.App = new Marionette.Application
 App.addRegions
