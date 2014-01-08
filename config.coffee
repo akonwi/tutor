@@ -13,8 +13,8 @@ global.db = new Datastore
   filename: path.join(gui.App.dataPath, 'words.db')
   autoload: true
 
-#db.remove {}, (err) ->
-#  console.log "cleared database"
+db.remove {}, (err) ->
+  console.log "cleared database"
 
 require './libs/backbone_config'
 
