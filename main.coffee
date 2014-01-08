@@ -10,10 +10,10 @@ db.findOne {}, (err, doc) ->
   if doc?
     word = new Word(doc)
     console.log "word is initially -->", word.get('word')
-    #word.set 'word', 'swag'
-    #word.save {}, success: (response) ->
-      #console.log response
-      #console.log "word is now -->", response.get('word')
+    word.set 'word', 'swag'
+    word.save {}, success: (response) ->
+      console.log response
+      console.log "word is now -->", response.get('word')
   else
     console.log "nada dawg"
 #window.alert word
