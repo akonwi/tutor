@@ -7,7 +7,6 @@ global.Handlebars = window.Handlebars
 global.$ = window.jQuery
 global._ = window._
 
-
 ## This is essentially just a collection of words
 global.db = new Datastore
   filename: path.join(gui.App.dataPath, 'words.db')
