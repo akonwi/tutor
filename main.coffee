@@ -4,9 +4,10 @@ Word = WordModule.model
 Words = WordModule.collection
 
 # Router is going to do what Backbone's router does but because node-webkit
-#   loads each html file, this router will skip url paths entirely and
-#   just use functions directly(kind of a rails-y DSL). These functions will
-#   act as controllers and should call render to display the relevant view
+#   routing works by serving individual html files, this router will skip
+#   url paths entirely and just use functions directly(kind of a rails-y DSL).
+#   These functions will act as controllers and should call @render to display
+#   the relevant view
 class Router
   # @params page string name of page to visit
   # @params args optional arguments used by methods as needed
