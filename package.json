@@ -8,6 +8,6 @@
   "dependencies": {
     "coffee-script": "*",
     "nedb": "~0.9.3",
-    "backbone.nedb": "0.0.1"
+    "backbone.nedb": "0.0.2"
   }
 }
