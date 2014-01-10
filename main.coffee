@@ -2,8 +2,6 @@ WordModule = require('./libs/word')
 Word = WordModule.model
 Words = WordModule.collection
 
-words_collection = new Words(db.getAllData())
-
 # Router is going to do what Backbone's router does but because node-webkit
 #   routing works by serving individual html files, this router will skip
 #   url paths entirely and just use functions directly(kind of a rails-y DSL).
@@ -22,10 +20,13 @@ class Router
     @render new HomeView()
 
   addWords: ->
-    @render new AddWordsView()
+    @render new AddWordsView(collection: @words())
 
   render: (view) ->
     App.container.show view
+
+  words: ->
+    App.words
 
 class HomeView extends Marionette.Layout
   template: Handlebars.compile $('#home-view').html()
@@ -55,8 +56,14 @@ class AddWordsView extends Marionette.Layout
       word:
         identifier: 'word'
         rules: [
-          type: 'empty'
-          prompt: "Can't have a blank entry"
+          {
+            type: 'empty'
+            prompt: "Can't have a blank entry"
+          },
+          {
+            type: 'exists'
+            prompt: "That word already exists"
+          }
         ]
       definition:
         identifier: 'definition'
@@ -69,6 +76,11 @@ class AddWordsView extends Marionette.Layout
     # TODO: trim the value
     $.fn.form.settings.rules.empty = (value) ->
       not _.isEmpty value
+
+    view = this
+    $.fn.form.settings.rules.exists = (value) ->
+      exists = view.collection.findWhere(word: value)
+      not exists?
 
     dropdown = @$el.find('.ui.selection.dropdown')
     dropdown.dropdown()
@@ -87,12 +99,7 @@ class AddWordsView extends Marionette.Layout
         attr.definition = form.form('get field', 'definition').val()
 
         word = new Word(attr)
-
-        # TODO: make this a validation rule
-        if words_collection.findWhere(word: attr.word)
-          window.alert "That already exists"
-        else
-          word.save()
+        word.save()
 
 global.App = new Marionette.Application
 App.addRegions
@@ -100,6 +107,7 @@ App.addRegions
 
 App.addInitializer (options) ->
   @router = new Router()
+  @words = new Words(db.getAllData())
 
 App.on 'initialize:after', ->
   @router.go 'home'
