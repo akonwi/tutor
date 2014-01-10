@@ -1,7 +1,8 @@
-Datastore = require 'nedb'
 WordModule = require('./libs/word')
 Word = WordModule.model
 Words = WordModule.collection
+
+words_collection = new Words(db.getAllData())
 
 # Router is going to do what Backbone's router does but because node-webkit
 #   routing works by serving individual html files, this router will skip
@@ -65,6 +66,7 @@ class AddWordsView extends Marionette.Layout
         ]
 
     # Overriding the default 'empty' rule for form validation
+    # TODO: trim the value
     $.fn.form.settings.rules.empty = (value) ->
       not _.isEmpty value
 
@@ -85,6 +87,12 @@ class AddWordsView extends Marionette.Layout
         attr.definition = form.form('get field', 'definition').val()
 
         word = new Word(attr)
+
+        # TODO: make this a validation rule
+        if words_collection.findWhere(word: attr.word)
+          window.alert "That already exists"
+        else
+          word.save()
 
 global.App = new Marionette.Application
 App.addRegions
