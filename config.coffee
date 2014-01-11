@@ -23,5 +23,7 @@ db.loadDatabase (err) ->
   #db.remove {}, (err) ->
     #console.log "cleared database"
 
+  # Setup app for everything that will use it
+  global.App = new Marionette.Application
   ## Launch the app
   require './main'
