@@ -58,7 +58,7 @@ module.exports =
       # Overriding the default 'empty' rule for form validation
       # TODO: trim the value
       $.fn.form.settings.rules.empty = (value) ->
-        not _.isEmpty value
+        not _.isEmpty _(value).trim()
 
       # adding an 'exists' rule
       view = this

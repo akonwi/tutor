@@ -35,7 +35,7 @@ App.addRegions
 
 App.addInitializer (options) ->
   @router = new Router()
-  @words = new Words(db.getAllData())
+  @words = new Words(_.shuffle(db.getAllData()))
 
 App.on 'initialize:after', ->
   @router.go 'home'

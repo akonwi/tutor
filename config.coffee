@@ -14,11 +14,14 @@ global.db = new Datastore(filename: path.join(gui.App.dataPath, 'words.db'))
 db.loadDatabase (err) ->
   console.log(err) if err?
 
-  ## Adding a method to underscore that removes beginning and ending whitespace
+  ## Adding a method to underscore that removes ending whitespace
   #  TODO: implement this
   _.mixin
     trim: (string) ->
-      copy = _.clone(string)
+      if _.last(string) is ' '
+        _(_.initial(string)).trim()
+      else
+        string.join ''
 
   #db.remove {}, (err) ->
     #console.log "cleared database"
