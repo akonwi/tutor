@@ -6,9 +6,13 @@ describe "underscore trim mixin", ->
   it "should return a string without the trailing whitespace", ->
     _.mixin
       trim: (string) ->
-        if _.last(string) is ' '
-          _(_.initial(string)).trim()
+        unless _.isEmpty string
+          if _.last(string) is ' '
+            @trim _.initial(string)
+          else
+            string.join ''
         else
-          string.join ''
+          string
 
     _("string   ").trim().should.eql "string"
+    _("").trim().should.eql ""
