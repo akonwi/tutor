@@ -88,6 +88,15 @@ module.exports =
     regions:
       title: '.teal.header'
 
+    initialize: ->
+      ## this model will be the model which will be quizzed on,
+      #  it will change as user continues and upon change,
+      #  the ui will change to reflect the new word
+      @model = @collection.shift().clone()
+      @model.on 'change', (model) =>
+        @title.show new TitleView(model: model)
+        @initialize_form()
+
     render: ->
       @$el.html @template()
       @title.show new TitleView(model: @model)
@@ -113,7 +122,13 @@ module.exports =
       form = @$el.find('.ui.form')
       form.form(rules, inline: true, on: 'submit')
 
-      # TODO: What happens on successful submission
+      ## If answer is correct, quiz on the next word by changing @model's attributes
+      view = this
+      form.form 'setting',
+        onSuccess: ->
+          next_word = view.collection.shift()
+          view.model.set(next_word.attributes)
+          $('#definition-input').val ''
 
 class TitleView extends Marionette.ItemView
   template: Handlebars.compile "{{word}}"
