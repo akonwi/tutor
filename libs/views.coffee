@@ -22,6 +22,9 @@ module.exports =
 
   addWords: class AddWordsView extends Marionette.Layout
     template: Handlebars.compile $('#add-words-view').html()
+    events:
+      'click #home': (e) -> @router().go 'home'
+      'click #studyWords': (e) -> @router().go 'studyWords'
 
     render: ->
       @$el.html @template()
@@ -85,6 +88,9 @@ module.exports =
 
   study: class StudyView extends Marionette.Layout
     template: Handlebars.compile $('#study-words-view').html()
+    events:
+      'click #home': (e) -> @router().go 'home'
+      'click #addWords' (e) -> @router().go 'addWords'
     regions:
       title: '.teal.header'
 
@@ -126,9 +132,12 @@ module.exports =
       view = this
       form.form 'setting',
         onSuccess: ->
-          next_word = view.collection.shift()
-          view.model.set(next_word.attributes)
-          $('#definition-input').val ''
+          if next_word = view.collection.shift()
+            view.model.set(next_word.attributes)
+            $('#definition-input').val ''
+          else
+            window.alert "there are no more words"
+            view.router().go 'home'
 
 class TitleView extends Marionette.ItemView
   template: Handlebars.compile "{{word}}"
