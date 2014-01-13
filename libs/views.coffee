@@ -9,16 +9,8 @@ module.exports =
   home: class HomeView extends Marionette.Layout
     template: Handlebars.compile $('#home-view').html()
     events:
-      'click #add-words-button': 'addWords'
-      'click #study-button': 'studyWords'
-
-    addWords: (e) ->
-      e.preventDefault()
-      @router().go 'addWords'
-
-    studyWords: (e) ->
-      e.preventDefault()
-      @router().go 'studyWords'
+      'click #add-words-button': (e) -> @router().go 'addWords'
+      'click #study-button': (e) -> @router().go 'studyWords'
 
   addWords: class AddWordsView extends Marionette.Layout
     template: Handlebars.compile $('#add-words-view').html()
@@ -60,7 +52,7 @@ module.exports =
 
       # Overriding the default 'empty' rule for form validation
       $.fn.form.settings.rules.empty = (value) ->
-        not _.isEmpty _(value).trim()
+        not _.isEmpty _.trim(value)
 
       # adding an 'exists' rule
       view = this
@@ -90,7 +82,7 @@ module.exports =
     template: Handlebars.compile $('#study-words-view').html()
     events:
       'click #home': (e) -> @router().go 'home'
-      'click #addWords' (e) -> @router().go 'addWords'
+      'click #addWords': (e) -> @router().go 'addWords'
     regions:
       title: '.teal.header'
 

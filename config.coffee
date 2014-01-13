@@ -15,15 +15,11 @@ db.loadDatabase (err) ->
   console.log(err) if err?
 
   ## Adding a method to underscore that removes ending whitespace
-  _.mixin
-    trim: (string) ->
-      unless _.isEmpty string
-        if _.last(string) is ' '
-          @trim _.initial(string)
-        else
-          string.join ''
-      else
-        string
+  _.trim = (string) ->
+    unless _.isEmpty string
+      if _.last(string) is ' ' then @trim(_.initial(string)) else string.join ''
+    else
+      if _.isString(string) then string else ''
 
   #db.remove {}, (err) ->
     #console.log "cleared database"

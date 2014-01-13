@@ -4,15 +4,12 @@ _ = require 'underscore'
 
 describe "underscore trim mixin", ->
   it "should return a string without the trailing whitespace", ->
-    _.mixin
-      trim: (string) ->
-        unless _.isEmpty string
-          if _.last(string) is ' '
-            @trim _.initial(string)
-          else
-            string.join ''
-        else
-          string
+    _.trim = (string) ->
+      unless _.isEmpty string
+        if _.last(string) is ' ' then @trim(_.initial(string)) else string.join ''
+      else
+        if _.isString(string) then string else ''
 
-    _("string   ").trim().should.eql "string"
-    _("").trim().should.eql ""
+    _.trim("string   ").should.eql "string"
+    _.trim("").should.eql ""
+    _.trim(" ").should.eql ''
