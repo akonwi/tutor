@@ -11,7 +11,7 @@ class Router
   # @params args optional arguments used by methods as needed
   go: (page, args...) ->
     if this[page]?
-      this[page]?(args)
+      this[page]?(args[0], args[1])
     else
       @home()
 
@@ -21,9 +21,11 @@ class Router
   addWords: ->
     @render new Views.addWords(collection: @words())
 
-  studyWords: ->
-    @render new Views.preStudy()
-    #@render new Views.study(collection: @words())
+  studyWords: (words) ->
+    if words?
+      @render new Views.study(collection: words)
+    else
+      @render new Views.preStudy(collection: @words())
 
   render: (view) ->
     App.container.show view

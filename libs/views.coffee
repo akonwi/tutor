@@ -84,7 +84,7 @@ module.exports =
   preStudy: class ChooseWordsView extends Marionette.Layout
     template: Handlebars.compile $('#choose-words-view').html()
     events:
-      'click .submit': (e) ->
+      'click #home': (e) -> @router().go 'home'
 
     render: ->
       @$el.html @template()
@@ -100,23 +100,22 @@ module.exports =
             prompt: 'Need a type'
           ]
 
-
       $dropdown = @$el.find('.ui.selection.dropdown')
       $dropdown.dropdown()
       $form = @$el.find('.ui.form')
       $form.form(rules, inline: true, on: 'submit')
 
       $form.form 'setting',
-        onSuccess: ->
+        onSuccess: =>
           word_type = $dropdown.dropdown 'get value'
-          # TODO: filter the word collection using word type and then
-          # route to the actual study view
-          console.log "the desired type is", word_type
+          unless word_type is 'all'
+            @collection = @collection.where(type: word_type)
+          @router().go 'studyWords', @collection
 
   study: class StudyView extends Marionette.Layout
     template: Handlebars.compile $('#study-words-view').html()
     events:
-      'click #home': (e) -> @router().go 'home'
+      'click #studyWords': (e) -> @router().go 'studyWords'
       'click #addWords': (e) -> @router().go 'addWords'
     regions:
       title: '.teal.header'
