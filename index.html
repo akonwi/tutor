@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-
     <title>Tutor</title>
     <link rel="stylesheet" type="text/css" href="css/semantic.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -72,10 +71,37 @@
               <div class="ui green submit button">Save</div>
             </div>
             <p id="home" class="ui mini red button">Back</p>
-            <p id="addWords" class="ui mini green button">Study</p>
+            <p id="studyWords" class="ui mini green button">Study</p>
           </div>
           <div class="column"></div>
         </div>
+      </script>
+
+      <script id='choose-words-view' type='handlebars'>
+        <div class="ui huge center aligned header">Study</div>
+        <div class="ui center aligned three column grid">
+          <div class="column"></div>
+          <div class="column">
+            <div class="ui teal medium center aligned header">Study by word type</div>
+            <div class="ui form segment">
+              <div class="field">
+                <div class="ui selection dropdown">
+                  <input type="hidden" name="type">
+                  <div class="default text">Type</div>
+                  <i class="dropdown icon"></i>
+                  <div class="menu ui transition hidden">
+                    <div class="item" data-value="all">All</div> 
+                    <div class="item" data-value="verb">Verb</div> 
+                    <div class="item" data-value="noun">Noun</div> 
+                    <div class="item" data-value="adjective">Adjective</div> 
+                    <div class="item" data-value="stuff">Stuff</div> 
+                  </div>
+                </div> 
+              </div>
+              <div class="ui green submit button">Continue</div>
+            </div>
+          </div>
+          <div class="column"></div>
       </script>
 
       <script id='study-words-view' type='handlebars'>

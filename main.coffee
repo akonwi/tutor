@@ -22,7 +22,8 @@ class Router
     @render new Views.addWords(collection: @words())
 
   studyWords: ->
-    @render new Views.study(collection: @words())
+    @render new Views.preStudy()
+    #@render new Views.study(collection: @words())
 
   render: (view) ->
     App.container.show view

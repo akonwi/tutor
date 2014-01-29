@@ -15,9 +15,10 @@ db.loadDatabase (err) ->
   console.log(err) if err?
 
   ## Adding a method to underscore that removes ending whitespace
+  #  TODO: handle string in the case of an object
   _.trim = (string) ->
     unless _.isEmpty string
-      if _.last(string) is ' ' then @trim(_.initial(string)) else string.join ''
+      if (_.last(string) is ' ') then @trim(_.initial(string)) else string.join('')
     else
       if _.isString(string) then string else ''
 

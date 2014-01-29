@@ -52,7 +52,7 @@ module.exports =
 
       # Overriding the default 'empty' rule for form validation
       $.fn.form.settings.rules.empty = (value) ->
-        not _.isEmpty _.trim(value)
+        not _.isEmpty value
 
       # adding an 'exists' rule
       view = this
@@ -76,7 +76,42 @@ module.exports =
           attr.definition = form.form('get field', 'definition').val()
 
           word = new Word(attr)
-          word.save()
+          word.save {},
+            success: (model) ->
+              form.form('get field', 'word').val ''
+              form.form('get field', 'definition').val ''
+
+  preStudy: class ChooseWordsView extends Marionette.Layout
+    template: Handlebars.compile $('#choose-words-view').html()
+    events:
+      'click .submit': (e) ->
+
+    render: ->
+      @$el.html @template()
+      @initialize_form()
+      this
+
+    initialize_form: ->
+      rules =
+        type:
+          identifier: 'type'
+          rules: [
+            type: 'empty'
+            prompt: 'Need a type'
+          ]
+
+
+      $dropdown = @$el.find('.ui.selection.dropdown')
+      $dropdown.dropdown()
+      $form = @$el.find('.ui.form')
+      $form.form(rules, inline: true, on: 'submit')
+
+      $form.form 'setting',
+        onSuccess: ->
+          word_type = $dropdown.dropdown 'get value'
+          # TODO: filter the word collection using word type and then
+          # route to the actual study view
+          console.log "the desired type is", word_type
 
   study: class StudyView extends Marionette.Layout
     template: Handlebars.compile $('#study-words-view').html()
