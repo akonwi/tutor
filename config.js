@@ -7,7 +7,9 @@
     }
   });
 
-  window.App = new Marionette.Applicaton;
+  console.log("whatup");
+
+  window.App = new Marionette.Applicaton();
 
   require(['main'], function(Main) {
     return Main();
