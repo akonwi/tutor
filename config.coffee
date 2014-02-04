@@ -35,7 +35,7 @@ requirejs.config
   paths:
     main: '../main'
 
-App = new Marionette.Applicaton()
+App = new Marionette.Application
 
 require ['main'], (Main) ->
   Main()

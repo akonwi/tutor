@@ -9,7 +9,7 @@
     }
   });
 
-  App = new Marionette.Applicaton();
+  App = new Marionette.Application;
 
   require(['main'], function(Main) {
     return Main();
