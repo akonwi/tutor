@@ -51,17 +51,18 @@
       return Router;
 
     })();
-    App.addRegions({
-      container: '#container'
-    });
-    App.addInitializer(function(options) {
-      this.router = new Router();
-      return this.words = new Words(_.shuffle(db.getAllData()));
-    });
-    App.on('initialize:after', function() {
-      return this.router.go('home');
-    });
     return function() {
+      window.App = new Marionette.Application;
+      App.addRegions({
+        container: '#container'
+      });
+      App.addInitializer(function(options) {
+        this.router = new Router();
+        return this.words = new Words(_.shuffle(db.getAllData()));
+      });
+      App.on('initialize:after', function() {
+        return this.router.go('home');
+      });
       return App.start();
     };
   });

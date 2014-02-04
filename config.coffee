@@ -35,7 +35,5 @@ requirejs.config
   paths:
     main: '../main'
 
-  window.App = new Marionette.Application
-
-require ['main'], (Main) ->
+requirejs ['main'], (Main) ->
   Main()

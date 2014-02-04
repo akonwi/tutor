@@ -5,9 +5,9 @@
     paths: {
       main: '../main'
     }
-  }, window.App = new Marionette.Application);
+  });
 
-  require(['main'], function(Main) {
+  requirejs(['main'], function(Main) {
     return Main();
   });
 

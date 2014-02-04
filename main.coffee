@@ -33,15 +33,13 @@ define ['views', 'word'], (Views, WordModule) ->
     words: ->
       App.words
 
-  App.addRegions
-    container: '#container'
-
-  App.addInitializer (options) ->
-    @router = new Router()
-    @words = new Words(_.shuffle(db.getAllData()))
-
-  App.on 'initialize:after', ->
-    @router.go 'home'
-
   return ->
+    window.App = new Marionette.Application
+    App.addRegions
+      container: '#container'
+    App.addInitializer (options) ->
+      @router = new Router()
+      @words = new Words(_.shuffle(db.getAllData()))
+    App.on 'initialize:after', ->
+      @router.go 'home'
     App.start()
