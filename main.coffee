@@ -44,4 +44,5 @@ define ['views', 'word'], (Views, WordModule) ->
     @router.go 'home'
 
   return ->
+    window.App = new Marionette.Applicaton
     App.start()
