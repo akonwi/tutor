@@ -62,6 +62,7 @@
       return this.router.go('home');
     });
     return function() {
+      window.App = new Marionette.Applicaton;
       return App.start();
     };
   });
