@@ -36,4 +36,5 @@ requirejs.config
     main: '../main'
 
 require ['main'], (Main) ->
+  window.App = new Marionette.Applicaton
   Main()

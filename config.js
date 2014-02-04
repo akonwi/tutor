@@ -8,6 +8,7 @@
   });
 
   require(['main'], function(Main) {
+    window.App = new Marionette.Applicaton;
     return Main();
   });
 
