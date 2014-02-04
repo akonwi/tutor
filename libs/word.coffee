@@ -1,8 +1,11 @@
-class Word extends Backbone.Model
-  idAttribute: '_id'
+define [], ->
+  class Word extends Backbone.Model
+    idAttribute: '_id'
 
-class Words extends Backbone.Collection
-  model: Word
+  class Words extends Backbone.Collection
+    model: Word
 
-module.exports.model = Word
-module.exports.collection = Words
+  return {
+    model: Word
+    collection: Words
+  }
