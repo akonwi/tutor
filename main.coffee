@@ -38,8 +38,9 @@ define ['views', 'word'], (Views, WordModule) ->
     App.addRegions
       container: '#container'
     App.addInitializer (options) ->
-      @router = new Router()
-      @words = new Words(_.shuffle(db.getAllData()))
+      @router = new Router
+      @words = new Words
+      #@words = new Words(_.shuffle(db.getAllData()))
     App.on 'initialize:after', ->
       @router.go 'home'
     App.start()

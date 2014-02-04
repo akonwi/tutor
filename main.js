@@ -57,8 +57,8 @@
         container: '#container'
       });
       App.addInitializer(function(options) {
-        this.router = new Router();
-        return this.words = new Words(_.shuffle(db.getAllData()));
+        this.router = new Router;
+        return this.words = new Words;
       });
       App.on('initialize:after', function() {
         return this.router.go('home');
