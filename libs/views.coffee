@@ -3,7 +3,7 @@ define ['word'], (WordsModule) ->
   Words = WordsModule.collection
 
   # alias for App.router inside of views
-  Backbone.View::router = -> App.router
+  Backbone.View::router = -> Tutor.router
 
   to_return =
     home: class HomeView extends Marionette.Layout
@@ -108,9 +108,10 @@ define ['word'], (WordsModule) ->
         $form.form 'setting',
           onSuccess: =>
             word_type = $dropdown.dropdown 'get value'
+            words = @collection
             unless word_type is 'all'
-              @collection = @collection.where(type: word_type)
-            @router().go 'studyWords', @collection
+              words = new Words(words.where(type: word_type))
+            @router().go 'studyWords', words
 
     study: class StudyView extends Marionette.Layout
       template: Handlebars.compile $('#study-words-view').html()

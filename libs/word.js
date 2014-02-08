@@ -13,7 +13,28 @@
         return _ref;
       }
 
-      Word.prototype.idAttribute = '_id';
+      Word.prototype.idAttribute = 'key';
+
+      Word.prototype.sync = function(method, model, options) {
+        if (method === 'create') {
+          console.log('creating word', model);
+          return new Lawnchair({
+            name: 'words',
+            record: 'word'
+          }, function() {
+            return this.save(model.toJSON(), function(word) {
+              console.log('created word', word);
+              if (typeof err === "undefined" || err === null) {
+                model.trigger('request', word);
+              }
+              if (typeof err !== "undefined" && err !== null) {
+                options.error(word);
+              }
+              return options.success(word);
+            });
+          });
+        }
+      };
 
       return Word;
 

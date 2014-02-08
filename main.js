@@ -24,46 +24,53 @@
 
       Router.prototype.addWords = function() {
         return this.render(new Views.addWords({
-          collection: this.words()
+          collection: Tutor.words
         }));
       };
 
       Router.prototype.studyWords = function(words) {
+        var _this = this;
         if (words != null) {
           return this.render(new Views.study({
             collection: words
           }));
         } else {
-          return this.render(new Views.preStudy({
-            collection: this.words()
-          }));
+          return Tutor.lawnchair.all(function(words) {
+            words = new Words(words);
+            return _this.render(new Views.preStudy({
+              collection: words
+            }));
+          });
         }
       };
 
       Router.prototype.render = function(view) {
-        return App.container.show(view);
-      };
-
-      Router.prototype.words = function() {
-        return App.words;
+        return Tutor.container.show(view);
       };
 
       return Router;
 
     })();
     return function() {
-      window.App = new Marionette.Application;
-      App.addRegions({
+      window.Tutor = new Marionette.Application;
+      Tutor.addRegions({
         container: '#container'
       });
-      App.addInitializer(function(options) {
+      Tutor.addInitializer(function(options) {
         this.router = new Router;
-        return this.words = new Words;
+        return this.lawnchair = new Lawnchair({
+          name: 'words',
+          record: 'word'
+        }, function() {
+          return this.all(function(words) {
+            return Tutor.words = new Words(words);
+          });
+        });
       });
-      App.on('initialize:after', function() {
+      Tutor.on('initialize:after', function() {
         return this.router.go('home');
       });
-      return App.start();
+      return Tutor.start();
     };
   });
 

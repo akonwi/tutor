@@ -8,7 +8,7 @@
     Word = WordsModule.model;
     Words = WordsModule.collection;
     Backbone.View.prototype.router = function() {
-      return App.router;
+      return Tutor.router;
     };
     to_return = {
       home: HomeView = (function(_super) {
@@ -176,14 +176,15 @@
           });
           return $form.form('setting', {
             onSuccess: function() {
-              var word_type;
+              var word_type, words;
               word_type = $dropdown.dropdown('get value');
+              words = _this.collection;
               if (word_type !== 'all') {
-                _this.collection = _this.collection.where({
+                words = new Words(words.where({
                   type: word_type
-                });
+                }));
               }
-              return _this.router().go('studyWords', _this.collection);
+              return _this.router().go('studyWords', words);
             }
           });
         };

@@ -19,28 +19,27 @@ define ['views', 'word'], (Views, WordModule) ->
       @render new Views.home()
 
     addWords: ->
-      @render new Views.addWords(collection: @words())
+      @render new Views.addWords(collection: Tutor.words)
 
     studyWords: (words) ->
       if words?
         @render new Views.study(collection: words)
       else
-        @render new Views.preStudy(collection: @words())
+        Tutor.lawnchair.all (words) =>
+          words = new Words(words)
+          @render new Views.preStudy(collection: words)
 
     render: (view) ->
-      App.container.show view
-
-    words: ->
-      App.words
+      Tutor.container.show view
 
   return ->
-    window.App = new Marionette.Application
-    App.addRegions
+    window.Tutor = new Marionette.Application
+    Tutor.addRegions
       container: '#container'
-    App.addInitializer (options) ->
+    Tutor.addInitializer (options) ->
       @router = new Router
-      @words = new Words
-      #@words = new Words(_.shuffle(db.getAllData()))
-    App.on 'initialize:after', ->
+      @lawnchair = new Lawnchair name: 'words', record: 'word', ->
+        @all (words) -> Tutor.words = new Words(words)
+    Tutor.on 'initialize:after', ->
       @router.go 'home'
-    App.start()
+    Tutor.start()
