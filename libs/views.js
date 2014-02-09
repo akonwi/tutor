@@ -62,13 +62,7 @@
           var dropdown, form, rules, view;
           rules = {
             type: {
-              identifier: 'type',
-              rules: [
-                {
-                  type: 'empty',
-                  prompt: 'Need a type'
-                }
-              ]
+              identifier: 'type'
             },
             word: {
               identifier: 'word',
@@ -115,15 +109,19 @@
               var attr, word;
               attr = {};
               attr.type = dropdown.dropdown('get value');
-              attr.word = form.form('get field', 'word').val();
-              attr.definition = form.form('get field', 'definition').val();
-              word = new Word(attr);
-              return word.save({}, {
-                success: function(model) {
-                  form.form('get field', 'word').val('');
-                  return form.form('get field', 'definition').val('');
-                }
-              });
+              if (_.isString(attr.type)) {
+                attr.word = form.form('get field', 'word').val();
+                attr.definition = form.form('get field', 'definition').val();
+                word = new Word(attr);
+                return word.save({}, {
+                  success: function(model) {
+                    form.form('get field', 'word').val('');
+                    return form.form('get field', 'definition').val('');
+                  }
+                });
+              } else {
+                return alert("Please select the type of word this is");
+              }
             }
           });
         };
@@ -171,7 +169,6 @@
           $dropdown.dropdown();
           $form = this.$el.find('.ui.form');
           $form.form(rules, {
-            inline: true,
             on: 'submit'
           });
           return $form.form('setting', {
@@ -185,6 +182,9 @@
                 }));
               }
               return _this.router().go('studyWords', words);
+            },
+            onFailure: function() {
+              return alert("Please choose which type of words to study");
             }
           });
         };
