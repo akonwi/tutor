@@ -24,9 +24,6 @@
           }, function() {
             return this.save(model.toJSON(), function(word) {
               console.log('created word', word);
-              if (typeof err === "undefined" || err === null) {
-                model.trigger('request', word);
-              }
               if (typeof err !== "undefined" && err !== null) {
                 options.error(word);
               }
