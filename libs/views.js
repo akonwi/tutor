@@ -220,6 +220,7 @@
 
         StudyView.prototype.initialize = function() {
           var _this = this;
+          this.wrong_count = 0;
           this.model = this.collection.shift().clone();
           return this.model.on('change', function(model) {
             _this.title.show(new TitleView({
@@ -239,7 +240,7 @@
         };
 
         StudyView.prototype.initialize_form = function() {
-          var definition, form, rules, view;
+          var $form, definition, rules, view;
           definition = this.model.get('definition');
           rules = {
             definition: {
@@ -255,27 +256,41 @@
               ]
             }
           };
-          form = this.$el.find('.ui.form');
-          form.form(rules, {
+          $form = this.$el.find('.ui.form');
+          $form.form(rules, {
             inline: true,
             on: 'submit'
           });
           view = this;
-          return form.form('setting', {
+          return $form.form('setting', {
             onSuccess: function() {
-              var next_word;
-              if (next_word = view.collection.shift()) {
-                view.model.set(next_word.attributes);
-                return $('#definition-input').val('');
-              } else {
+              return view.showNext();
+            },
+            onFailure: function() {
+              view.wrong_count++;
+              if (view.wrong_count === 3) {
                 Messenger().post({
-                  message: "There are no more words",
-                  type: ''
+                  type: '',
+                  message: "The correct answer is '" + (view.model.get('definition')) + "'"
                 });
-                return view.router().go('home');
+                return view.showNext();
               }
             }
           });
+        };
+
+        StudyView.prototype.showNext = function() {
+          var next_word;
+          if (next_word = this.collection.shift()) {
+            this.model.set(next_word.attributes);
+            return $('#definition-input').val('');
+          } else {
+            Messenger().post({
+              type: '',
+              message: 'There are no more words'
+            });
+            return this.router().go('home');
+          }
         };
 
         return StudyView;
