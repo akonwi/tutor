@@ -24,11 +24,14 @@
           }, function() {
             return this.save(model.toJSON(), function(word) {
               console.log('created word', word);
-              if (typeof err !== "undefined" && err !== null) {
-                options.error(word);
-              }
-              if (typeof success !== "undefined" && success !== null) {
-                return options.success(word);
+              if (word != null) {
+                if (options.success != null) {
+                  return options.success(word);
+                }
+              } else {
+                if (options.error != null) {
+                  return options.error(model);
+                }
               }
             });
           });

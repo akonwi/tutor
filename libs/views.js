@@ -106,6 +106,7 @@
               var attr, word;
               attr = {};
               attr.type = dropdown.dropdown('get value');
+              console.log("the type is", attr.type);
               if (_.isString(attr.type)) {
                 attr.word = form.form('get field', 'word').val();
                 attr.definition = form.form('get field', 'definition').val();
