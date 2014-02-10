@@ -9,7 +9,7 @@
 
   requirejs(['main'], function(Main) {
     Messenger.options = {
-      extraClasses: 'messenger-fixed messenger-on-bottom',
+      extraClasses: 'messenger-fixed messenger-on-top',
       theme: 'ice'
     };
     return Main();
