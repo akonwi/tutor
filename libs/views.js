@@ -61,9 +61,6 @@
         AddWordsView.prototype.initialize_form = function() {
           var dropdown, form, rules, view;
           rules = {
-            type: {
-              identifier: 'type'
-            },
             word: {
               identifier: 'word',
               rules: [
@@ -120,7 +117,10 @@
                   }
                 });
               } else {
-                return alert("Please select the type of word this is");
+                return Messenger().post({
+                  type: 'error',
+                  message: 'Please choose a type'
+                });
               }
             }
           });
@@ -184,7 +184,10 @@
               return _this.router().go('studyWords', words);
             },
             onFailure: function() {
-              return alert("Please choose which type of words to study");
+              return Messenger().post({
+                message: 'Please choose which type of words to study',
+                type: 'error'
+              });
             }
           });
         };
@@ -265,7 +268,10 @@
                 view.model.set(next_word.attributes);
                 return $('#definition-input').val('');
               } else {
-                window.alert("there are no more words");
+                Messenger().post({
+                  message: "There are no more words",
+                  type: ''
+                });
                 return view.router().go('home');
               }
             }

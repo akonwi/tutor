@@ -8,6 +8,10 @@
   });
 
   requirejs(['main'], function(Main) {
+    Messenger.options = {
+      extraClasses: 'messenger-fixed messenger-on-bottom',
+      theme: 'ice'
+    };
     return Main();
   });
 

@@ -27,7 +27,9 @@
               if (typeof err !== "undefined" && err !== null) {
                 options.error(word);
               }
-              return options.success(word);
+              if (typeof success !== "undefined" && success !== null) {
+                return options.success(word);
+              }
             });
           });
         }
