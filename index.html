@@ -11,120 +11,99 @@
     <link rel="stylesheet" type="text/css" href="css/messenger-theme-ice.css">
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
     <script type='text/javascript' src="js/jquery-2.0.3.js"></script>
-    <script type='text/javascript' src="js/underscore.js"></script>
-    <script type='text/javascript' src="js/backbone.js"></script>
-    <script type='text/javascript' src="js/backbone.marionette.js"></script>
-    <script type='text/javascript' src="js/handlebars-v1.2.0.js"></script>
+    <script type='text/javascript' src="js/handlebars-v1.3.0.js"></script>
+    <script type='text/javascript' src="js/emblem.min.js"></script>
+    <script type='text/javascript' src="js/ember.min.js"></script>
+    <script type='text/javascript' src="js/ember-data.js"></script>
+    <script type='text/javascript' src="js/localstorage_adapter.js"></script>
     <script type='text/javascript' src="js/semantic.js"></script>
     <script type='text/javascript' src="js/lawnchair.js"></script>
     <script type='text/javascript' src="js/lawnchair-query.js"></script>
     <script type='text/javascript' src="js/lawnchair-dom.js"></script>
     <script type='text/javascript' src="js/messenger.js"></script>
     <script type='text/javascript' src="js/messenger-theme-flat.js"></script>
-    <script type='text/javascript' src="js/require.js" data-main="config.js"></script>
   </head>
   <body>
-    <div id="container">
-      <script id='home-view' type='handlebars'>
-        <div class="ui huge center aligned header">Tutor</div>
-        <div class="ui large center aligned header">Let's Study!</div>
-        <div class="ui center aligned two column grid">
-          <div class="row">
-            <div id="study-button" class="ui button">Study</div>   
-          </div> 
-          <div class="row">
-            <div id="add-words-button" class="ui button">Add Words</div>   
-          </div> 
-        </div>
-      </script>
+    <script type='text/x-emblem' data-template-name='home'>
+      .ui.huge.center.aligned.header Tutor
+      .ui.large.center.aligned.header Let's Study!
+      .ui.center.aligned.two.column.grid
+        .row
+          linkTo .ui.button 'study' | Study
+        .row
+          linkTo .ui.button 'addWords' | Add Words
+    </script>
 
-      <script id='add-words-view' type="handlebars">
-        <div class="ui huge center aligned header">Add Words</div> 
-        <div class="ui center aligned three column grid">
-        <!--In order to center-align a column right now, I'm using two spacer columns on each side-->
-          <div class="column"></div>
-          <div class="column">
-            <div class="ui form segment">
-              <div class="field">
-                <div class="ui selection dropdown">
-                  <input type="hidden" name="type">
-                  <div class="default text">Type</div>
-                  <i class="dropdown icon"></i>
-                  <div class="menu ui transition hidden">
-                    <div class="item" data-value="verb">Verb</div>
-                    <div class="item" data-value="noun">Noun</div>
-                    <div class="item" data-value="adjective">Adjective</div>
-                    <div class="item" data-value="stuff">Stuff</div>
-                  </div>
-                </div>
-              </div>
-              <div class="field">
-                <div class="ui input">
-                  <input id="word-input" type="text" name="word" placeholder="Word"> 
-                </div> 
-              </div>
-              <div class="field">
-                <div class="ui input">
-                  <input id="word-definition" type="text" name="definition" placeholder="Definition"> 
-                </div> 
-              </div>
-              <div class="ui green submit button">Save</div>
-            </div>
-            <p id="home" class="ui mini red button">Back</p>
-            <p id="studyWords" class="ui mini green button">Study</p>
-          </div>
-          <div class="column"></div>
-        </div>
-      </script>
+    <script type='text/x-emblem' data-template-name='addWords'>
+      .ui.huge.center.aligned.header Add Words
+      .ui.center.aligned.three.column.grid
+        / in order to center align a column right now, you need to use filler columns on each side
+        .column
+        .column: Tutor.AddWordsForm
+        .column
+    </script>
 
-      <script id='choose-words-view' type='handlebars'>
-        <div class="ui huge center aligned header">Study</div>
-        <div class="ui center aligned three column grid">
-          <div class="column"></div>
-          <div class="column">
-            <div class="ui teal medium center aligned header">Study by word type</div>
-            <div class="ui form segment">
-              <div class="field">
-                <div class="ui selection dropdown">
-                  <input type="hidden" name="type">
-                  <div class="default text">Type</div>
-                  <i class="dropdown icon"></i>
-                  <div class="menu ui transition hidden">
-                    <div class="item" data-value="all">All</div> 
-                    <div class="item" data-value="verb">Verb</div> 
-                    <div class="item" data-value="noun">Noun</div> 
-                    <div class="item" data-value="adjective">Adjective</div> 
-                    <div class="item" data-value="stuff">Stuff</div> 
-                  </div>
-                </div> 
-              </div>
-              <div class="ui green submit button">Continue</div>
-            </div>
-            <p id="home" class="ui mini red button">Back</p>
-          </div>
-          <div class="column"></div>
-      </script>
+    <script type='text/x-emblem' data-template-name='addWordsForm'>
+      .ui.form.segment
+        .field
+          .ui.selection.dropdown
+            input type='hidden' 
+            .default.text Type
+            i.dropdown.icon
+            .menu.ui.transition.hidden
+              .item data-value='verb' Verb
+              .item data-value='noun' Noun
+              .item data-value='adjective' Adjective
+              .item data-value='stuff' Stuff
+        .field
+          .ui.input
+            = input valueBinding='view.word' type='text' placeholder='Word'
+        .field
+          .ui.input
+            = input valueBinding='view.definition' type='text' placeholder='Definition'
+        button.ui.green.button Save
+      linkTo .ui.mini.red.button 'home' | Back 
+      linkTo .ui.mini.green.button 'study' | Study
+    </script>
+    
+    <script type='text/x-emblem' data-template-name='study'>
+      .ui.huge.center.aligned.header Study
+      .ui.center.aligned.three.column.grid
+        .column
+        .column
+          .ui.teal.medium.center.aligned.header
+          = outlet
+        .column
+    </script>
 
-      <script id='study-words-view' type='handlebars'>
-        <div class="ui huge center aligned header">Study</div>
-        <div class="ui center aligned three column grid">
-          <div class="column"></div>
-          <div class="column">
-            <div class="ui teal medium center aligned header"></div>  
-            <div class="ui form segment">
-              <div class="field">
-                <div class="ui input">
-                  <input id="definition-input" type="text" name="definition" placeholder="Definition">
-                </div>
-              </div>   
-              <div class="ui green submit button">Check</div>
-            </div>
-            <p id="studyWords" class="ui mini red button">Back</p>
-            <p id="addWords" class="ui mini green button">Add Words</p>
-          </div>
-          <div class="column"></div>
-        </div>
-      </script>
-    </div>
+    <script type='text/x-emblem' data-template-name='study/index'>
+      .ui.teal.medium.center.aligned.header Study by word type
+      Tutor.ChooseTypeForm 
+        .ui.form.segment
+          .field
+            .ui.selection.dropdown
+              input type='hidden' 
+              .default.text All
+              i.dropdown.icon
+              .menu.ui.transition.hidden
+                .item data-value='verb' Verb
+                .item data-value='noun' Noun
+                .item data-value='adjective' Adjective
+                .item data-value='stuff' Stuff
+          Tutor.ChooseContinueBtn
+            button.ui.green.button Continue
+      linkTo .ui.mini.red.button 'home' | Back
+    </script>
+
+    <script type='text/x-emblem' data-template-name='study/words'>
+      .ui.teal.medium.center.aligned.header= currentWord.word
+      .ui.form.segment 
+        .field class=isWrong:error
+          .ui.input class=isWrong:error
+            = input valueBinding='definition' placeholder='Definition' enter='check'
+      linkTo .ui.mini.red.button 'study' | Back
+      linkTo .ui.mini.green.button 'addWords' | Add Words
+    </script>
+    <script type='text/javascript' src="tutor.js"></script>
   </body>
 </html>

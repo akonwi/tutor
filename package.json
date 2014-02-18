@@ -9,5 +9,9 @@
     "coffee-script": "*",
     "nedb": "~0.9.3",
     "backbone.nedb": "0.0.2"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-coffee": "~0.10.0"
   }
 }
