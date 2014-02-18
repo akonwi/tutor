@@ -1,7 +1,7 @@
 (function() {
   window.Tutor = Ember.Application.create();
 
-  Tutor.ApplicatoinSerializer = DS.LSSerializer.extend();
+  Tutor.ApplicationSerializer = DS.LSSerializer.extend();
 
   Tutor.ApplicationAdapter = DS.LSAdapter.extend({
     namespace: 'tutor-ember'
@@ -54,30 +54,35 @@
           this.set('word', '');
           return this.set('definition', '');
         }
-      } else {
-        return Messenger().post('need a type');
       }
-    },
-    change: function() {
-      return console.log('it changed');
-    },
+    }
+  });
+
+  ({
     didInsertElement: function() {
-      var $dropdown, $form;
-      $dropdown = $('.ui.selection.dropdown').dropdown();
-      this.set('dropdown', $dropdown);
-      return $form = $('.ui.form').form();
+      var dropdown;
+      dropdown = $('.ui.selection.dropdown').dropdown();
+      this.set('dropdown', dropdown);
+      return $('.ui.form').form();
     }
   });
 
   Tutor.ChooseTypeForm = Ember.View.extend({
     didInsertElement: function() {
-      var $dropdown;
-      $dropdown = $('.ui.selection.dropdown').dropdown();
-      return this.set('dropdown', $dropdown);
+      var dropdown;
+      dropdown = $('.ui.selection.dropdown').dropdown();
+      return this.set('dropdown', dropdown);
     },
     "continue": function() {
       var type;
       type = this.get('dropdown').dropdown('get value');
+      console.log(typeof type);
+      if (typeof type !== 'string') {
+        type = 'all';
+      } else {
+        console.log('it was a string');
+      }
+      console.log(type);
       return this.get('controller').transitionToRoute('study.words', type);
     }
   });
@@ -109,17 +114,17 @@
       }
     },
     showNext: function() {
-      var popped;
-      popped = this.get('model').without(this.get('currentWord'));
-      this.set('model', popped);
-      if (popped.get('length') === 0) {
+      var newModel;
+      newModel = this.get('model').without(this.get('currentWord'));
+      this.set('model', newModel);
+      if (newModel.get('length') === 0) {
         Messenger().post({
           type: '',
           message: 'No more words'
         });
         return this.transitionToRoute('home');
       } else {
-        return this.set('currentWord', popped.get('firstObject'));
+        return this.set('currentWord', newModel.get('firstObject'));
       }
     }
   });
@@ -128,11 +133,11 @@
     model: function(params) {
       var type;
       type = params.type;
-      if ((type = params.type) && type === 'all') {
+      if (type === 'all') {
         return this.store.find('word');
       } else {
         return this.store.find('word', {
-          type: params.type
+          type: type
         });
       }
     }
