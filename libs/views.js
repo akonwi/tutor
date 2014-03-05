@@ -274,6 +274,7 @@
                   type: '',
                   message: "The correct answer is '" + (view.model.get('definition')) + "'"
                 });
+                view.wrong_count = 0;
                 return view.showNext();
               }
             }
