@@ -268,7 +268,7 @@
               return view.showNext();
             },
             onFailure: function() {
-              view.wrong_count++;
+              //view.wrong_count++;
               if (view.wrong_count === 3) {
                 Messenger().post({
                   type: '',
