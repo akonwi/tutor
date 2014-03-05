@@ -36,7 +36,7 @@
           }));
         } else {
           return Tutor.lawnchair.all(function(words) {
-            words = new Words(words);
+            words = (new Words(words)).shuffle();
             return _this.render(new Views.preStudy({
               collection: words
             }));
