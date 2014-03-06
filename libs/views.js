@@ -179,9 +179,9 @@
               word_type = $dropdown.dropdown('get value');
               words = _this.collection;
               if (word_type !== 'all') {
-                words = new Words(words.where({
+                words = new Words(words).where({
                   type: word_type
-                }));
+                });
               }
               return _this.router().go('studyWords', words);
             },
