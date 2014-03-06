@@ -114,7 +114,8 @@
                 return word.save({}, {
                   success: function(model) {
                     form.form('get field', 'word').val('');
-                    return form.form('get field', 'definition').val('');
+                    form.form('get field', 'definition').val('');
+                    $('#word-input').focus()
                   }
                 });
               } else {
