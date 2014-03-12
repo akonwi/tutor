@@ -67,11 +67,13 @@ define ['word'], (WordsModule) ->
               word = new Word(attr)
               word.save {},
                 success: (model) ->
-                  $form.form('get field', 'word').val()
-                  $form.form('get field', 'definition').val()
+                  $form.form('get field', 'word').val ''
+                  $form.form('get field', 'definition').val ''
                   $('#word-input').focus()
             else
-              Messenger().error 'Please choose a type'
+              Messenger().post
+                message: 'Please choose a type'
+                type: ''
 
     preStudy: class ChooseWordsView extends Marionette.Layout
       template: Handlebars.compile $('#choose-words-view').html()
@@ -99,11 +101,13 @@ define ['word'], (WordsModule) ->
           onSuccess: =>
             word_type = $dropdown.dropdown('get value')
             words = @collection
-            if word_type is not 'all'
+            unless word_type is 'all'
               words = new Words(words).where(type: word_type)
             @router().go 'studyWords', words
           onFailure: ->
-            Messenger().error 'Please choose which type of words to study'
+            Messenger().post
+              message: 'Please choose which type of words to study'
+              type: ''
 
     study: class StudyView extends Marionette.Layout
       template: Handlebars.compile $('#study-words-view').html()
@@ -152,8 +156,12 @@ define ['word'], (WordsModule) ->
           @model.set(next_word.attributes)
           $('#definition-input').val ''
         else
-          Messenger.error 'There are no more words'
+          Messenger().post
+            message: 'There are no more words'
+            type: ''
           @router().go 'home'
 
   class TitleView extends Marionette.ItemView
     template: Handlebars.compile "{{word}}"
+
+  to_return
