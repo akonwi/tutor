@@ -11,6 +11,13 @@ define [], ->
               options.success?(word)
             else
               options.error?(model)
+      if method is 'update'
+        console.log 'updating word', model
+        new Lawnchair name: 'words', record: 'word', ->
+          @where "word.word === '#{model.get('word')}'", (words) ->
+            words[0].definition = model.get('definition')
+            @save words[0], (word) ->
+              console.log 'updated word', word
 
   class Words extends Backbone.Collection
     model: Word

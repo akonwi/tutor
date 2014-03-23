@@ -20,6 +20,11 @@ define ['views', 'word'], (Views, WordModule) ->
           words = (new Words(words)).shuffle()
           @render new Views.preStudy(collection: words)
 
+    edit: ->
+      Tutor.lawnchair.all (words) =>
+        words = new Words(words)
+        @render new Views.editWords(collection: words)
+
     render: (view) ->
       Tutor.container.show view
 

@@ -44,6 +44,17 @@
         }
       };
 
+      Router.prototype.edit = function() {
+        return Tutor.lawnchair.all((function(_this) {
+          return function(words) {
+            words = new Words(words);
+            return _this.render(new Views.editWords({
+              collection: words
+            }));
+          };
+        })(this));
+      };
+
       Router.prototype.render = function(view) {
         return Tutor.container.show(view);
       };

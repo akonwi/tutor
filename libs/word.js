@@ -16,7 +16,7 @@
       Word.prototype.sync = function(method, model, options) {
         if (method === 'create') {
           console.log('creating word', model);
-          return new Lawnchair({
+          new Lawnchair({
             name: 'words',
             record: 'word'
           }, function() {
@@ -27,6 +27,20 @@
               } else {
                 return typeof options.error === "function" ? options.error(model) : void 0;
               }
+            });
+          });
+        }
+        if (method === 'update') {
+          console.log('updating word', model);
+          return new Lawnchair({
+            name: 'words',
+            record: 'word'
+          }, function() {
+            return this.where("word.word === '" + (model.get('word')) + "'", function(words) {
+              words[0].definition = model.get('definition');
+              return this.save(words[0], function(word) {
+                return console.log('updated word', word);
+              });
             });
           });
         }

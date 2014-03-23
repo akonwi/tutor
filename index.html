@@ -30,16 +30,19 @@
         <div class="ui large center aligned header">Let's Study!</div>
         <div class="ui center aligned two column grid">
           <div class="row">
-            <div id="study-button" class="ui button">Study</div>   
-          </div> 
+            <div id="study-button" class="ui button">Study</div>
+          </div>
           <div class="row">
-            <div id="add-words-button" class="ui button">Add Words</div>   
-          </div> 
+            <div id="add-words-button" class="ui button">Add Words</div>
+          </div>
+          <div class="row">
+            <div id="edit-words-button" class="ui button">Edit Words</div>
+          </div>
         </div>
       </script>
 
       <script id='add-words-view' type="handlebars">
-        <div class="ui huge center aligned header">Add Words</div> 
+        <div class="ui huge center aligned header">Add Words</div>
         <div class="ui center aligned three column grid">
         <!--In order to center-align a column right now, I'm using two spacer columns on each side-->
           <div class="column"></div>
@@ -60,13 +63,13 @@
               </div>
               <div class="field">
                 <div class="ui input">
-                  <input id="word-input" type="text" name="word" placeholder="Word"> 
-                </div> 
+                  <input id="word-input" type="text" name="word" placeholder="Word">
+                </div>
               </div>
               <div class="field">
                 <div class="ui input">
-                  <input id="word-definition" type="text" name="definition" placeholder="Definition"> 
-                </div> 
+                  <input id="word-definition" type="text" name="definition" placeholder="Definition">
+                </div>
               </div>
               <div class="ui green submit button">Save</div>
             </div>
@@ -90,13 +93,13 @@
                   <div class="default text">Type</div>
                   <i class="dropdown icon"></i>
                   <div class="menu ui transition hidden">
-                    <div class="item" data-value="all">All</div> 
-                    <div class="item" data-value="verb">Verb</div> 
-                    <div class="item" data-value="noun">Noun</div> 
-                    <div class="item" data-value="adjective">Adjective</div> 
-                    <div class="item" data-value="stuff">Stuff</div> 
+                    <div class="item" data-value="all">All</div>
+                    <div class="item" data-value="verb">Verb</div>
+                    <div class="item" data-value="noun">Noun</div>
+                    <div class="item" data-value="adjective">Adjective</div>
+                    <div class="item" data-value="stuff">Stuff</div>
                   </div>
-                </div> 
+                </div>
               </div>
               <div class="ui green submit button">Continue</div>
             </div>
@@ -110,19 +113,40 @@
         <div class="ui center aligned three column grid">
           <div class="column"></div>
           <div class="column">
-            <div class="ui teal medium center aligned header"></div>  
+            <div class="ui teal medium center aligned header"></div>
             <div class="ui form segment">
               <div class="field">
                 <div class="ui input">
                   <input id="definition-input" type="text" name="definition" placeholder="Definition">
                 </div>
-              </div>   
+              </div>
               <div class="ui green submit button">Check</div>
             </div>
             <p id="studyWords" class="ui mini red button">Back</p>
             <p id="addWords" class="ui mini green button">Add Words</p>
           </div>
           <div class="column"></div>
+        </div>
+      </script>
+
+      <script id='edit-words-view' type='handlebars'>
+        <div class="ui huge center aligned header">Edit</div>
+        <div class="ui center aligned three column grid">
+          <div class="column"></div>
+          <div class="column" id="center-column"></div>
+          <div class="column"></div>
+        </div>
+      </script>
+
+      <script id='edit-word-view' type='handlebars'>
+        <div class="ui form segment edit-word">
+          <div class="ui huge center header">{{word}}</div>
+          <div class="field">
+            <div class="ui input">
+              <input id="definition-input" type="text" name="definition" value="{{definition}}" placeholder="Definition">
+            </div>
+          </div>
+          <div class="ui green submit mini button">Update</div>
         </div>
       </script>
     </div>

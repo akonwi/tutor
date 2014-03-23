@@ -10,6 +10,7 @@ define ['word'], (WordsModule) ->
       events:
         'click #add-words-button': (e) -> @router().go 'addWords'
         'click #study-button': (e) -> @router().go 'studyWords'
+        'click #edit-words-button': (e) -> @router().go 'edit'
 
     addWords: class AddWordsView extends Marionette.Layout
       template: Handlebars.compile $('#add-words-view').html()
@@ -160,6 +161,44 @@ define ['word'], (WordsModule) ->
             message: 'There are no more words'
             type: ''
           @router().go 'home'
+
+    editWords: class EditWords extends Marionette.Layout
+      template: Handlebars.compile $('#edit-words-view').html()
+      regions:
+        main: '#center-column'
+
+      render: ->
+        @$el.html @template()
+        @main.show new EditWordsCollection(collection: @collection)
+        this
+
+  class EditWordView extends Marionette.ItemView
+    template: Handlebars.compile $('#edit-word-view').html()
+
+    render: ->
+      @$el.html @template(@model.attributes)
+      @initialize_form()
+      this
+
+    initialize_form: ->
+      rules =
+        definition:
+          identifier: 'definition'
+          rules: [
+            {
+              type: 'empty'
+              prompt: 'Need a definition'
+            }
+          ]
+
+      $form = @$el.find('.ui.form').form(rules, inline: true, on: 'submit')
+      $form.form 'setting',
+        onSuccess: =>
+          new_def = $form.form('get field', 'definition').val()
+          @model.save definition: new_def
+
+  class EditWordsCollection extends Marionette.CollectionView
+    itemView: EditWordView
 
   class TitleView extends Marionette.ItemView
     template: Handlebars.compile "{{word}}"

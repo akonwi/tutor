@@ -17,3 +17,5 @@ body {
   text-rendering: optimizeLegibility;
   min-width: 320px;
 }
+
+.segment.edit-word { margin-bottom: 10px !important; }

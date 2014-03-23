@@ -3,7 +3,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(['word'], function(WordsModule) {
-    var AddWordsView, ChooseWordsView, HomeView, StudyView, TitleView, Word, Words, to_return;
+    var AddWordsView, ChooseWordsView, EditWordView, EditWords, EditWordsCollection, HomeView, StudyView, TitleView, Word, Words, to_return;
     Word = WordsModule.model;
     Words = WordsModule.collection;
     Backbone.View.prototype.router = function() {
@@ -25,6 +25,9 @@
           },
           'click #study-button': function(e) {
             return this.router().go('studyWords');
+          },
+          'click #edit-words-button': function(e) {
+            return this.router().go('edit');
           }
         };
 
@@ -281,8 +284,92 @@
 
         return StudyView;
 
+      })(Marionette.Layout),
+      editWords: EditWords = (function(_super) {
+        __extends(EditWords, _super);
+
+        function EditWords() {
+          return EditWords.__super__.constructor.apply(this, arguments);
+        }
+
+        EditWords.prototype.template = Handlebars.compile($('#edit-words-view').html());
+
+        EditWords.prototype.regions = {
+          main: '#center-column'
+        };
+
+        EditWords.prototype.render = function() {
+          this.$el.html(this.template());
+          this.main.show(new EditWordsCollection({
+            collection: this.collection
+          }));
+          return this;
+        };
+
+        return EditWords;
+
       })(Marionette.Layout)
     };
+    EditWordView = (function(_super) {
+      __extends(EditWordView, _super);
+
+      function EditWordView() {
+        return EditWordView.__super__.constructor.apply(this, arguments);
+      }
+
+      EditWordView.prototype.template = Handlebars.compile($('#edit-word-view').html());
+
+      EditWordView.prototype.render = function() {
+        this.$el.html(this.template(this.model.attributes));
+        this.initialize_form();
+        return this;
+      };
+
+      EditWordView.prototype.initialize_form = function() {
+        var $form, rules;
+        rules = {
+          definition: {
+            identifier: 'definition',
+            rules: [
+              {
+                type: 'empty',
+                prompt: 'Need a definition'
+              }
+            ]
+          }
+        };
+        $form = this.$el.find('.ui.form').form(rules, {
+          inline: true,
+          on: 'submit'
+        });
+        return $form.form('setting', {
+          onSuccess: (function(_this) {
+            return function() {
+              var new_def;
+              new_def = $form.form('get field', 'definition').val();
+              return _this.model.save({
+                definition: new_def
+              });
+            };
+          })(this)
+        });
+      };
+
+      return EditWordView;
+
+    })(Marionette.ItemView);
+    EditWordsCollection = (function(_super) {
+      __extends(EditWordsCollection, _super);
+
+      function EditWordsCollection() {
+        return EditWordsCollection.__super__.constructor.apply(this, arguments);
+      }
+
+      EditWordsCollection.prototype.itemView = EditWordView;
+
+      return EditWordsCollection;
+
+    })(Marionette.CollectionView);
     TitleView = (function(_super) {
       __extends(TitleView, _super);
 
