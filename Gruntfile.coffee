@@ -3,9 +3,9 @@ module.exports = (grunt) ->
     coffee:
       compile:
         files:
-          'config.js': 'src/config.coffee'
-          'main.js': 'src/main.coffee'
-          'libs/views.js': 'src/views.coffee'
-          'libs/word.js': 'src/word.coffee'
+          'config.js': 'config.coffee'
+          'main.js': 'main.coffee'
+          'libs/views.js': 'libs/views.coffee'
+          'libs/word.js': 'libs/word.coffee'
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
