@@ -217,10 +217,6 @@
           title: '.teal.header'
         };
 
-        StudyView.prototype.onRender = function() {
-          return console.log('hey');
-        };
-
         StudyView.prototype.initialize = function() {
           this.model = this.collection.shift().clone();
           return this.model.on('change', (function(_this) {
@@ -270,10 +266,6 @@
               };
             })(this)
           });
-        };
-
-        StudyView.prototype.onRender = function() {
-          return alert('renderd');
         };
 
         StudyView.prototype.showNext = function() {
@@ -340,6 +332,10 @@
         return this;
       };
 
+      EditWordView.prototype.onRender = function() {
+        return alert('hey');
+      };
+
       EditWordView.prototype.initialize_form = function() {
         var $form, rules;
         rules = {
@@ -397,20 +393,6 @@
           return;
         }
         return EditWordsCollection.__super__.addItemView.apply(this, arguments);
-      };
-
-      EditWordsCollection.prototype.onAfterItemAdded = function(view) {
-        return this.count++;
-      };
-
-      EditWordsCollection.prototype.onItemRemoved = function(view) {
-        this.count--;
-        if (this.count === 0) {
-          return Messenger().error({
-            message: 'No words found',
-            hideAfter: 3
-          });
-        }
       };
 
       return EditWordsCollection;

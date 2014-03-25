@@ -152,9 +152,6 @@ define ['word'], (WordsModule) ->
           onSuccess: =>
             @showNext()
 
-      onRender: ->
-        alert 'renderd'
-
       showNext: ->
         if next_word = @collection.shift()
           @model.set(next_word.attributes)
@@ -188,6 +185,8 @@ define ['word'], (WordsModule) ->
       @initialize_form()
       this
 
+    onRender: ->
+      alert 'hey'
     initialize_form: ->
       rules =
         definition:
@@ -224,16 +223,6 @@ define ['word'], (WordsModule) ->
     addItemView: (model) ->
       return unless ~model.get('word').indexOf @filteredBy
       super
-
-    onAfterItemAdded: (view) ->
-      @count++
-
-    onItemRemoved: (view) ->
-      @count--
-      if @count is 0
-        Messenger().error
-          message: 'No words found'
-          hideAfter: 3
 
   # Sidebar Menu with search bar in edit view
   # TODO: make this a region in Tutor namespace and modify
