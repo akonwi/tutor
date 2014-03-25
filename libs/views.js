@@ -332,10 +332,6 @@
         return this;
       };
 
-      EditWordView.prototype.onRender = function() {
-        return alert('hey');
-      };
-
       EditWordView.prototype.initialize_form = function() {
         var $form, rules;
         rules = {
@@ -379,8 +375,7 @@
       EditWordsCollection.prototype.itemView = EditWordView;
 
       EditWordsCollection.prototype.initialize = function() {
-        this.filteredBy = '';
-        return this.count = 0;
+        return this.filteredBy = '';
       };
 
       EditWordsCollection.prototype.filterBy = function(val) {
