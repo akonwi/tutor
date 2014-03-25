@@ -185,8 +185,6 @@ define ['word'], (WordsModule) ->
       @initialize_form()
       this
 
-    onRender: ->
-      alert 'hey'
     initialize_form: ->
       rules =
         definition:
@@ -207,10 +205,7 @@ define ['word'], (WordsModule) ->
   class EditWordsCollection extends Marionette.CollectionView
     itemView: EditWordView
 
-    initialize: ->
-      @filteredBy = ''
-      # keep track of how many results are shown
-      @count = 0
+    initialize: -> @filteredBy = ''
 
     # re-render when filter changes
     filterBy: (val) ->
