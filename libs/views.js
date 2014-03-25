@@ -3,7 +3,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(['word'], function(WordsModule) {
-    var AddWordsView, ChooseWordsView, EditWordView, EditWords, EditWordsCollection, HomeView, StudyView, TitleView, Word, Words, to_return;
+    var AddWordsView, ChooseWordsView, EditWordView, EditWords, EditWordsCollection, EditWordsSearch, HomeView, StudyView, TitleView, Word, Words, to_return;
     Word = WordsModule.model;
     Words = WordsModule.collection;
     Backbone.View.prototype.router = function() {
@@ -217,6 +217,10 @@
           title: '.teal.header'
         };
 
+        StudyView.prototype.onRender = function() {
+          return console.log('hey');
+        };
+
         StudyView.prototype.initialize = function() {
           this.model = this.collection.shift().clone();
           return this.model.on('change', (function(_this) {
@@ -268,6 +272,10 @@
           });
         };
 
+        StudyView.prototype.onRender = function() {
+          return alert('renderd');
+        };
+
         StudyView.prototype.showNext = function() {
           var next_word;
           if (next_word = this.collection.shift()) {
@@ -295,14 +303,21 @@
         EditWords.prototype.template = Handlebars.compile($('#edit-words-view').html());
 
         EditWords.prototype.regions = {
-          main: '#center-column'
+          main: '#center-column',
+          search: '#search-column'
         };
 
         EditWords.prototype.render = function() {
+          var collectionView, searchView;
           this.$el.html(this.template());
-          this.main.show(new EditWordsCollection({
+          collectionView = new EditWordsCollection({
             collection: this.collection
-          }));
+          });
+          this.main.show(collectionView);
+          searchView = new EditWordsSearch().on('filterChange', function(val) {
+            return collectionView.filterBy(val);
+          });
+          this.search.show(searchView);
           return this;
         };
 
@@ -367,9 +382,60 @@
 
       EditWordsCollection.prototype.itemView = EditWordView;
 
+      EditWordsCollection.prototype.initialize = function() {
+        this.filteredBy = '';
+        return this.count = 0;
+      };
+
+      EditWordsCollection.prototype.filterBy = function(val) {
+        this.filteredBy = val;
+        return this.render();
+      };
+
+      EditWordsCollection.prototype.addItemView = function(model) {
+        if (!~model.get('word').indexOf(this.filteredBy)) {
+          return;
+        }
+        return EditWordsCollection.__super__.addItemView.apply(this, arguments);
+      };
+
+      EditWordsCollection.prototype.onAfterItemAdded = function(view) {
+        return this.count++;
+      };
+
+      EditWordsCollection.prototype.onItemRemoved = function(view) {
+        this.count--;
+        if (this.count === 0) {
+          return Messenger().error({
+            message: 'No words found',
+            hideAfter: 3
+          });
+        }
+      };
+
       return EditWordsCollection;
 
     })(Marionette.CollectionView);
+    EditWordsSearch = (function(_super) {
+      __extends(EditWordsSearch, _super);
+
+      function EditWordsSearch() {
+        return EditWordsSearch.__super__.constructor.apply(this, arguments);
+      }
+
+      EditWordsSearch.prototype.template = Handlebars.compile($('#edit-words-search-view').html());
+
+      EditWordsSearch.prototype.className = 'ui inverted floating thin right sidebar vertical menu active';
+
+      EditWordsSearch.prototype.events = {
+        'input': function(e) {
+          return this.trigger('filterChange', $(e.target).val());
+        }
+      };
+
+      return EditWordsSearch;
+
+    })(Marionette.Layout);
     TitleView = (function(_super) {
       __extends(TitleView, _super);
 

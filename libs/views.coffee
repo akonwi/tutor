@@ -152,6 +152,9 @@ define ['word'], (WordsModule) ->
           onSuccess: =>
             @showNext()
 
+      onRender: ->
+        alert 'renderd'
+
       showNext: ->
         if next_word = @collection.shift()
           @model.set(next_word.attributes)
@@ -166,10 +169,15 @@ define ['word'], (WordsModule) ->
       template: Handlebars.compile $('#edit-words-view').html()
       regions:
         main: '#center-column'
+        search: '#search-column'
 
       render: ->
         @$el.html @template()
-        @main.show new EditWordsCollection(collection: @collection)
+        collectionView = new EditWordsCollection(collection: @collection)
+        @main.show collectionView
+        searchView = new EditWordsSearch()
+          .on 'filterChange', (val) -> collectionView.filterBy(val)
+        @search.show searchView
         this
 
   class EditWordView extends Marionette.ItemView
@@ -199,6 +207,42 @@ define ['word'], (WordsModule) ->
 
   class EditWordsCollection extends Marionette.CollectionView
     itemView: EditWordView
+
+    initialize: ->
+      @filteredBy = ''
+      # keep track of how many results are shown
+      @count = 0
+
+    # re-render when filter changes
+    filterBy: (val) ->
+      @filteredBy = val
+      @render()
+
+    # overriding Marionette.CollectionView method to only
+    #  show item if it passes filter set by user.
+    #  Essentially searching if word contains @filteredBy string
+    addItemView: (model) ->
+      return unless ~model.get('word').indexOf @filteredBy
+      super
+
+    onAfterItemAdded: (view) ->
+      @count++
+
+    onItemRemoved: (view) ->
+      @count--
+      if @count is 0
+        Messenger().error
+          message: 'No words found'
+          hideAfter: 3
+
+  # Sidebar Menu with search bar in edit view
+  # TODO: make this a region in Tutor namespace and modify
+  #  per route
+  class EditWordsSearch extends Marionette.Layout
+    template: Handlebars.compile $('#edit-words-search-view').html()
+    className: 'ui inverted floating thin right sidebar vertical menu active'
+    events:
+      'input': (e) -> @trigger 'filterChange', $(e.target).val()
 
   class TitleView extends Marionette.ItemView
     template: Handlebars.compile "{{word}}"
