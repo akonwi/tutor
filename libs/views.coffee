@@ -179,6 +179,8 @@ define ['word'], (WordsModule) ->
 
   class EditWordView extends Marionette.ItemView
     template: Handlebars.compile $('#edit-word-view').html()
+    events:
+      'click .red.button': 'delete'
 
     render: ->
       @$el.html @template(@model.attributes)
@@ -201,6 +203,8 @@ define ['word'], (WordsModule) ->
         onSuccess: =>
           new_def = $form.form('get field', 'definition').val()
           @model.save definition: new_def
+
+    delete: (e) -> @model.destroy()
 
   class EditWordsCollection extends Marionette.CollectionView
     itemView: EditWordView

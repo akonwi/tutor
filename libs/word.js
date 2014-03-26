@@ -13,13 +13,15 @@
 
       Word.prototype.idAttribute = 'key';
 
+      Word.prototype.db_options = {
+        name: 'words',
+        record: 'word'
+      };
+
       Word.prototype.sync = function(method, model, options) {
         if (method === 'create') {
           console.log('creating word', model);
-          new Lawnchair({
-            name: 'words',
-            record: 'word'
-          }, function() {
+          new Lawnchair(this.db_options, function() {
             return this.save(model.toJSON(), function(word) {
               console.log('created word', word);
               if (word != null) {
@@ -32,16 +34,18 @@
         }
         if (method === 'update') {
           console.log('updating word', model);
-          return new Lawnchair({
-            name: 'words',
-            record: 'word'
-          }, function() {
+          new Lawnchair(this.db_options, function() {
             return this.where("word.word === '" + (model.get('word')) + "'", function(words) {
               words[0].definition = model.get('definition');
               return this.save(words[0], function(word) {
                 return console.log('updated word', word);
               });
             });
+          });
+        }
+        if (method === 'delete') {
+          return new Lawnchair(this.db_options, function() {
+            return this.remove(model.toJSON());
           });
         }
       };

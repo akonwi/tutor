@@ -326,6 +326,10 @@
 
       EditWordView.prototype.template = Handlebars.compile($('#edit-word-view').html());
 
+      EditWordView.prototype.events = {
+        'click .red.button': 'delete'
+      };
+
       EditWordView.prototype.render = function() {
         this.$el.html(this.template(this.model.attributes));
         this.initialize_form();
@@ -360,6 +364,10 @@
             };
           })(this)
         });
+      };
+
+      EditWordView.prototype["delete"] = function(e) {
+        return this.model.destroy();
       };
 
       return EditWordView;
