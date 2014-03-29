@@ -8,11 +8,13 @@ module.exports = (grunt) ->
           'libs/views.js': 'libs/views.coffee'
           'libs/word.js': 'libs/word.coffee'
     watch:
+      options:
+        livereload: 3000
       source:
         files: '**/*.coffee'
         tasks: 'coffee'
-        options:
-          livereload: 3000
+      html:
+        files: 'index.html'
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'

@@ -231,6 +231,8 @@ define ['word'], (WordsModule) ->
     className: 'ui inverted floating thin right sidebar vertical menu active'
     events:
       'input': (e) -> @trigger 'filterChange', $(e.target).val()
+      'click .red.button': (e) -> @router().go 'home'
+      'click .green.button': (e) -> @router().go 'studyWords'
 
   class TitleView extends Marionette.ItemView
     template: Handlebars.compile "{{word}}"

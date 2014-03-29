@@ -415,6 +415,12 @@
       EditWordsSearch.prototype.events = {
         'input': function(e) {
           return this.trigger('filterChange', $(e.target).val());
+        },
+        'click .red.button': function(e) {
+          return this.router().go('home');
+        },
+        'click .green.button': function(e) {
+          return this.router().go('studyWords');
         }
       };
 
