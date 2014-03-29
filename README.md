@@ -1,6 +1,8 @@
 ## Tutor
 Language studying app built with node.js on node-webkit
 
+[![endorse](https://api.coderwall.com/akonwi/endorsecount.png)](https://coderwall.com/akonwi)
+
 This was originally a ruby app built with shoes4 for studying vocab in french but the shoes DSL is still a work in progress with issues I'm tired of fighting against s I'm attempting to convert it into a javascript/HTML5 app
 
 ### Update
