@@ -218,6 +218,7 @@
         };
 
         StudyView.prototype.initialize = function() {
+          this.incorrect = 0;
           this.model = this.collection.shift().clone();
           return this.model.on('change', (function(_this) {
             return function(model) {
@@ -264,12 +265,23 @@
               return function() {
                 return _this.showNext();
               };
+            })(this),
+            onFailure: (function(_this) {
+              return function() {
+                if (_this.incorrect === 3) {
+                  console.log("The answer is " + definition);
+                  return _this.incorrect = 0;
+                } else {
+                  return _this.incorrect++;
+                }
+              };
             })(this)
           });
         };
 
         StudyView.prototype.showNext = function() {
           var next_word;
+          this.incorrect = 0;
           if (next_word = this.collection.shift()) {
             this.model.set(next_word.attributes);
             return $('#definition-input').val('');

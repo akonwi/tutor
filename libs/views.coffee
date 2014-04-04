@@ -120,6 +120,7 @@ define ['word'], (WordsModule) ->
         title: '.teal.header'
 
       initialize: ->
+        @incorrect = 0
         @model = @collection.shift().clone()
         @model.on 'change', (model) =>
           @title.show new TitleView(model: model)
@@ -151,8 +152,15 @@ define ['word'], (WordsModule) ->
         $form.form 'setting',
           onSuccess: =>
             @showNext()
+          onFailure: =>
+            if @incorrect is 3
+              console.log "The answer is #{definition}"
+              @incorrect = 0
+            else
+              @incorrect++
 
       showNext: ->
+        @incorrect = 0
         if next_word = @collection.shift()
           @model.set(next_word.attributes)
           $('#definition-input').val ''
