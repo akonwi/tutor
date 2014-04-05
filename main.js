@@ -56,6 +56,7 @@
       };
 
       Router.prototype.render = function(view) {
+        Tutor.sidebar.reset();
         return Tutor.container.show(view);
       };
 

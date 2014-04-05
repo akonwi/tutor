@@ -78,12 +78,11 @@ define ['word'], (WordsModule) ->
 
     preStudy: class ChooseWordsView extends Marionette.Layout
       template: Handlebars.compile $('#choose-words-view').html()
-      events:
-        'click #home': (e) -> @router().go 'home'
 
       render: ->
         @$el.html @template()
         @initialize_form()
+        @router().menu new ChooseWordsMenu
         this
 
       initialize_form: ->
@@ -230,9 +229,6 @@ define ['word'], (WordsModule) ->
       return unless ~model.get('word').indexOf @filteredBy
       super
 
-  # Sidebar Menu with search bar in edit view
-  # TODO: make this a region in Tutor namespace and modify
-  #  per route
   class EditWordsSearch extends Marionette.Layout
     template: Handlebars.compile $('#edit-words-search-view').html()
     events:
@@ -242,5 +238,12 @@ define ['word'], (WordsModule) ->
 
   class TitleView extends Marionette.ItemView
     template: Handlebars.compile "{{word}}"
+
+  class ChooseWordsMenu extends Marionette.ItemView
+    template: Handlebars.compile "<i class='home icon'></i>Home"
+    tagName: 'a'
+    className: 'home item'
+    events:
+      'click': -> @router().go 'home'
 
   to_return

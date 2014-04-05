@@ -3,7 +3,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(['word'], function(WordsModule) {
-    var AddWordsView, ChooseWordsView, EditWordView, EditWords, EditWordsCollection, EditWordsSearch, HomeView, StudyView, TitleView, Word, Words, to_return;
+    var AddWordsView, ChooseWordsMenu, ChooseWordsView, EditWordView, EditWords, EditWordsCollection, EditWordsSearch, HomeView, StudyView, TitleView, Word, Words, to_return;
     Word = WordsModule.model;
     Words = WordsModule.collection;
     Backbone.View.prototype.router = function() {
@@ -139,15 +139,10 @@
 
         ChooseWordsView.prototype.template = Handlebars.compile($('#choose-words-view').html());
 
-        ChooseWordsView.prototype.events = {
-          'click #home': function(e) {
-            return this.router().go('home');
-          }
-        };
-
         ChooseWordsView.prototype.render = function() {
           this.$el.html(this.template());
           this.initialize_form();
+          this.router().menu(new ChooseWordsMenu);
           return this;
         };
 
@@ -446,6 +441,28 @@
       TitleView.prototype.template = Handlebars.compile("{{word}}");
 
       return TitleView;
+
+    })(Marionette.ItemView);
+    ChooseWordsMenu = (function(_super) {
+      __extends(ChooseWordsMenu, _super);
+
+      function ChooseWordsMenu() {
+        return ChooseWordsMenu.__super__.constructor.apply(this, arguments);
+      }
+
+      ChooseWordsMenu.prototype.template = Handlebars.compile("<i class='home icon'></i>Home");
+
+      ChooseWordsMenu.prototype.tagName = 'a';
+
+      ChooseWordsMenu.prototype.className = 'home item';
+
+      ChooseWordsMenu.prototype.events = {
+        'click': function() {
+          return this.router().go('home');
+        }
+      };
+
+      return ChooseWordsMenu;
 
     })(Marionette.ItemView);
     return to_return;

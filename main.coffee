@@ -26,6 +26,7 @@ define ['views', 'word'], (Views, WordModule) ->
         @render new Views.editWords(collection: words)
 
     render: (view) ->
+      Tutor.sidebar.reset()
       Tutor.container.show view
 
     menu: (view) ->
