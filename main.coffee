@@ -28,9 +28,14 @@ define ['views', 'word'], (Views, WordModule) ->
     render: (view) ->
       Tutor.container.show view
 
+    menu: (view) ->
+      Tutor.sidebar.show view
+
   return ->
     window.Tutor = new Marionette.Application
-    Tutor.addRegions container: '#container'
+    Tutor.addRegions
+      container: '#container'
+      sidebar: '#side-menu'
     Tutor.addInitializer (options) ->
       @router = new Router
       @lawnchair = new Lawnchair

@@ -59,13 +59,18 @@
         return Tutor.container.show(view);
       };
 
+      Router.prototype.menu = function(view) {
+        return Tutor.sidebar.show(view);
+      };
+
       return Router;
 
     })();
     return function() {
       window.Tutor = new Marionette.Application;
       Tutor.addRegions({
-        container: '#container'
+        container: '#container',
+        sidebar: '#side-menu'
       });
       Tutor.addInitializer(function(options) {
         this.router = new Router;

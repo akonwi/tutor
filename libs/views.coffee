@@ -174,7 +174,6 @@ define ['word'], (WordsModule) ->
       template: Handlebars.compile $('#edit-words-view').html()
       regions:
         main: '#center-column'
-        search: '#search-column'
 
       render: ->
         @$el.html @template()
@@ -182,7 +181,7 @@ define ['word'], (WordsModule) ->
         @main.show collectionView
         searchView = new EditWordsSearch()
           .on 'filterChange', (val) -> collectionView.filterBy(val)
-        @search.show searchView
+        @router().menu searchView
         this
 
   class EditWordView extends Marionette.ItemView
@@ -236,11 +235,10 @@ define ['word'], (WordsModule) ->
   #  per route
   class EditWordsSearch extends Marionette.Layout
     template: Handlebars.compile $('#edit-words-search-view').html()
-    className: 'ui inverted floating thin right sidebar vertical menu active'
     events:
       'input': (e) -> @trigger 'filterChange', $(e.target).val()
-      'click .red.button': (e) -> @router().go 'home'
-      'click .green.button': (e) -> @router().go 'studyWords'
+      'click .home.item': (e) -> @router().go 'home'
+      'click .study.item': (e) -> @router().go 'studyWords'
 
   class TitleView extends Marionette.ItemView
     template: Handlebars.compile "{{word}}"

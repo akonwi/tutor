@@ -307,8 +307,7 @@
         EditWords.prototype.template = Handlebars.compile($('#edit-words-view').html());
 
         EditWords.prototype.regions = {
-          main: '#center-column',
-          search: '#search-column'
+          main: '#center-column'
         };
 
         EditWords.prototype.render = function() {
@@ -321,7 +320,7 @@
           searchView = new EditWordsSearch().on('filterChange', function(val) {
             return collectionView.filterBy(val);
           });
-          this.search.show(searchView);
+          this.router().menu(searchView);
           return this;
         };
 
@@ -422,16 +421,14 @@
 
       EditWordsSearch.prototype.template = Handlebars.compile($('#edit-words-search-view').html());
 
-      EditWordsSearch.prototype.className = 'ui inverted floating thin right sidebar vertical menu active';
-
       EditWordsSearch.prototype.events = {
         'input': function(e) {
           return this.trigger('filterChange', $(e.target).val());
         },
-        'click .red.button': function(e) {
+        'click .home.item': function(e) {
           return this.router().go('home');
         },
-        'click .green.button': function(e) {
+        'click .study.item': function(e) {
           return this.router().go('studyWords');
         }
       };
