@@ -1,4 +1,7 @@
-View::router = -> Tutor.router
+View::go = (page) -> Tutor.go page
+
+View::isString = (obj) ->
+  toString.call(obj).indexOf('String') isnt -1
 
 window.Views =
   home: class HomeView extends View
@@ -13,80 +16,29 @@ window.Views =
               click: 'study',
               'Study'
           @div class: 'row', =>
-            @div id: 'add-words-button', class: 'ui button', 'Add Words'
+            @div id: 'add-words-button',
+              class: 'ui button',
+              click: 'add'
+              'Add words'
           @div class: 'row', =>
-            @div id='edit-words-button', class: 'ui button', 'Edit Words'
+            @div id: 'edit-words-button',
+              class: 'ui button',
+              click: 'edit',
+              'Edit Words'
 
-    study: -> @router().go 'studyWords'
-    # template: Handlebars.compile $('#home-view').html()
-    # events:
-    #   'click #add-words-button': (e) -> @router().go 'addWords'
-    #   'click #study-button': (e) -> @router().go 'studyWords'
-    #   'click #edit-words-button': (e) -> @router().go 'edit'
+    study: -> @go 'studyWords'
+    add: -> @go 'addWords'
+    edit: -> @go 'edit'
 
-  addWords: class AddWordsView extends Marionette.Layout
-    template: Handlebars.compile $('#add-words-view').html()
-    events:
-      'click #home': (e) -> @router().go 'home'
-      'click #studyWords': (e) -> @router().go 'studyWords'
-
-    render: ->
-      @$el.html @template()
-      @initialize_form()
-      this
-
-    initialize_form: ->
-      rules =
-        word:
-          identifier: 'word'
-          rules: [
-            {
-              type: 'empty',
-              prompt: "Can't have a blank entry"
-            }, {
-              type: 'exists'
-              prompt: 'That word already exists'
-            }
-          ]
-        definition:
-          identifier: 'definition'
-          rules: [
-            type: 'empty'
-            prompt: 'Need a definition'
-          ]
-
-      # override semantic validation rule
-      $.fn.form.settings.rules.empty = (value) ->
-        not _.isEmpty(value)
-
-      #view = this
-      $.fn.form.settings.rules.exists = (value) =>
-        exists = @collection.findWhere(word: value)
-        not exists?
-
-      $dropdown = @$el.find('.ui.selection.dropdown').dropdown()
-      $form = @$el.find('.ui.form')
-      $form.form(rules,
-        inline: true
-        on: 'submit'
-      )
-      $form.form 'setting',
-        onSuccess: ->
-          attr = {}
-          attr.type = $dropdown.dropdown('get value')
-          if _.isString(attr.type)
-            attr.word = $form.form('get field', 'word').val()
-            attr.definition = $form.form('get field', 'definition').val()
-            word = new Word(attr)
-            word.save {},
-              success: (model) ->
-                $form.form('get field', 'word').val ''
-                $form.form('get field', 'definition').val ''
-                $('#word-input').focus()
-          else
-            Messenger().post
-              message: 'Please choose a type'
-              type: ''
+  addWords: class AddWordsView extends View
+    @content: ->
+      @div id: 'content', =>
+        @div class: 'ui huge center aligned header', 'Add Words'
+        @div class: 'ui center aligned three column grid', =>
+          @div class: 'column'
+          @div class: 'column', =>
+            @subview 'chooseTypeForm', new ChooseTypeForm()
+          @div class: 'column'
 
   preStudy: class ChooseWordsView extends Marionette.Layout
     template: Handlebars.compile $('#choose-words-view').html()
@@ -194,6 +146,76 @@ window.Views =
         .on 'filterChange', (val) -> collectionView.filterBy(val)
       @router().menu searchView
       this
+
+class ChooseTypeForm extends View
+  @content: ->
+    @div class: 'ui form segment', =>
+      @div class: 'field', =>
+        @div class: 'ui selection dropdown', =>
+          @input type: 'hidden', name: 'type'
+          @div class: 'default text', 'Type'
+          @i class: 'dropdown icon'
+          @div class: 'menu ui transition hidden', =>
+            for name in ['Verb', 'Noun', 'Adjective', 'Stuff']
+              @div class: 'item', 'data-value': name, name
+      @div class: 'field', =>
+        @div class: 'ui input', =>
+          @input id: 'word-input', type: 'text', name: 'word', placeholder: 'Word'
+      @div class: 'field', =>
+        @div class: 'ui input', =>
+          @input id: 'word-definition', type: 'text', name: 'definition', placeholder: 'Definition'
+      @div class: 'ui green submit button', 'Save'
+
+  initialize: ->
+    rules =
+      word:
+        identifier: 'word'
+        rules: [
+          {
+            type: 'empty',
+            prompt: "Can't have a blank entry"
+          }, {
+            type: 'exists'
+            prompt: 'That word already exists'
+          }
+        ]
+      definition:
+        identifier: 'definition'
+        rules: [
+          type: 'empty'
+          prompt: 'Need a definition'
+        ]
+
+    $.fn.form.settings.rules.empty = (value) ->
+      not (value.length is 0)
+
+    $.fn.form.settings.rules.exists = (value) ->
+      not Tutor.get('words').findWhere(word: value)
+
+    $dropdown = @find('.ui.selection.dropdown').dropdown()
+    # the root element of this view is the '.ui.form'
+    # so the #form method from semantic is an
+    # instance method on this view
+    @form rules,
+      inline: true
+      on: 'submit'
+    .form 'setting',
+      onSuccess: =>
+        attr = {}
+        attr.type = $dropdown.dropdown('get value')
+        if @isString attr.type
+          attr.word = @form('get field', 'word').val()
+          attr.definition = @form('get field', 'definition').val()
+          word = new Word(attr)
+            .save {},
+              success: (model) =>
+                @form('get field', 'word').val ''
+                @form('get field', 'definition').val ''
+                @find('#word-input').focus()
+        else
+          Messenger().post
+            message: 'Please choose a type'
+            type: ''
 
 class EditWordView extends Marionette.ItemView
   template: Handlebars.compile $('#edit-word-view').html()
