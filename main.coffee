@@ -17,12 +17,9 @@ class Tutor extends Cosmo.Router
   addWords: -> @render new Views.addWords
 
   studyWords: (words) ->
-    console.log 'words', words
     if words?
       @render new Views.study(collection: words)
     else
-      @get('lawnchair').all (words) =>
-        words = (new Words(words)).shuffle()
         @render new Views.preStudy
 
   edit: ->

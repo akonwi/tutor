@@ -43,7 +43,7 @@ class Cosmo.Router
 
   go: (page, args...) ->
     console.log 'page is', page
-    console.log 'args are', args
+    console.log 'arg is', args[0]
     if this[page]?
       this[page]?(args[0], args[1])
     else
