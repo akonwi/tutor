@@ -157,7 +157,7 @@ class ChooseTypeForm extends View
           @i class: 'dropdown icon'
           @div class: 'menu ui transition hidden', =>
             for name in ['Verb', 'Noun', 'Adjective', 'Stuff']
-              @div class: 'item', 'data-value': name, name
+              @div class: 'item', 'data-value': name.toLowerCase(), name
       @div class: 'field', =>
         @div class: 'ui input', =>
           @input id: 'word-input', type: 'text', name: 'word', placeholder: 'Word'
@@ -193,9 +193,7 @@ class ChooseTypeForm extends View
       not Tutor.get('words').findWhere(word: value)
 
     $dropdown = @find('.ui.selection.dropdown').dropdown()
-    # the root element of this view is the '.ui.form'
-    # so the #form method from semantic is an
-    # instance method on this view
+    # this is the form so call `this.form`
     @form rules,
       inline: true
       on: 'submit'
