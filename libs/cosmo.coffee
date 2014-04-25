@@ -42,6 +42,8 @@ class Cosmo.Router
   get: (key) -> this[key]
 
   go: (page, args...) ->
+    console.log 'page is', page
+    console.log 'args are', args
     if this[page]?
       this[page]?(args[0], args[1])
     else

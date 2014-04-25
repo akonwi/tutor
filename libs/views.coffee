@@ -1,4 +1,4 @@
-View::go = (page) -> Tutor.go page
+View::go = (page, args...) -> Tutor.go page, (args if args.length isnt 0)
 
 View::isString = (obj) ->
   toString.call(obj).indexOf('String') isnt -1
@@ -37,19 +37,27 @@ window.Views =
         @div class: 'ui center aligned three column grid', =>
           @div class: 'column'
           @div class: 'column', =>
-            @subview 'chooseTypeForm', new ChooseTypeForm()
+            @subview 'addWordsForm', new AddWordsForm
           @div class: 'column'
 
-  preStudy: class ChooseWordsView extends Marionette.Layout
-    template: Handlebars.compile $('#choose-words-view').html()
+  preStudy: class ChooseWordsView extends View
+    @content: ->
+      @div id: 'content', =>
+        @div class: 'ui huge center aligned header', 'Study'
+        @div class: 'ui center aligned three column grid', =>
+          @div class: 'column'
+          @div class: 'column', =>
+            @div class: 'ui teal medium center aligned header', 'Study by type'
+            @div class: 'ui form segment', =>
+              @subview 'typeDropdown', new TypeDropdown
+              @div class: 'ui green submit button', 'Continue'
+          @div class: 'column'
 
-    render: ->
-      @$el.html @template()
-      @initialize_form()
-      @router().menu new ChooseWordsMenu
-      this
+    initialize: ->
+      # first add 'All' option to dropdown
+      @typeDropdown.find('.menu').prepend $$ ->
+        @div class: 'item', 'data-value': 'all', 'All'
 
-    initialize_form: ->
       rules =
         type:
           identifier: 'type'
@@ -58,20 +66,20 @@ window.Views =
             prompt: 'Need a type'
           ]
 
-      $dropdown = @$el.find('.ui.selection.dropdown').dropdown()
-      $form = @$el.find('.ui.form')
+      $dropdown = @find('.ui.selection.dropdown').dropdown()
+      $form = @find('.ui.form')
       $form.form(rules, on: 'submit')
-      $form.form 'setting',
-        onSuccess: =>
-          word_type = $dropdown.dropdown('get value')
-          words = @collection
-          unless word_type is 'all'
-            words = new Words(words).where(type: word_type)
-          @router().go 'studyWords', words
-        onFailure: ->
-          Messenger().post
-            message: 'Please choose which type of words to study'
-            type: ''
+        .form 'setting',
+          onSuccess: =>
+            word_type = $dropdown.dropdown('get value')
+            words = Tutor.get('words')
+            unless word_type is 'all'
+              words = new Words(words).where(type: word_type)
+            @go 'studyWords', words
+          onFailure: ->
+            Messenger().post
+              message: 'Please choose which type of words to study'
+              type: ''
 
   study: class StudyView extends Marionette.Layout
     template: Handlebars.compile $('#study-words-view').html()
@@ -147,17 +155,10 @@ window.Views =
       @router().menu searchView
       this
 
-class ChooseTypeForm extends View
+class AddWordsForm extends View
   @content: ->
     @div class: 'ui form segment', =>
-      @div class: 'field', =>
-        @div class: 'ui selection dropdown', =>
-          @input type: 'hidden', name: 'type'
-          @div class: 'default text', 'Type'
-          @i class: 'dropdown icon'
-          @div class: 'menu ui transition hidden', =>
-            for name in ['Verb', 'Noun', 'Adjective', 'Stuff']
-              @div class: 'item', 'data-value': name.toLowerCase(), name
+      @subview 'typeDropdown', new TypeDropdown
       @div class: 'field', =>
         @div class: 'ui input', =>
           @input id: 'word-input', type: 'text', name: 'word', placeholder: 'Word'
@@ -214,6 +215,17 @@ class ChooseTypeForm extends View
           Messenger().post
             message: 'Please choose a type'
             type: ''
+
+class TypeDropdown extends View
+  @content: ->
+    @div class: 'field', =>
+      @div class: 'ui selection dropdown', =>
+        @input type: 'hidden', name: 'type'
+        @div class: 'default text', 'Type'
+        @i class: 'dropdown icon'
+        @div class: 'menu ui transition hidden', =>
+          for name in ['Verb', 'Noun', 'Adjective', 'Stuff']
+            @div class: 'item', 'data-value': name, name
 
 class EditWordView extends Marionette.ItemView
   template: Handlebars.compile $('#edit-word-view').html()
