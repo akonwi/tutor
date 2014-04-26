@@ -82,8 +82,14 @@ window.Views =
             Tutor.get('lawnchair').all (words) =>
               collection = new Words(words)
               unless word_type is 'all'
-                collection = new Words(words).where(type: word_type)
-              @go 'studyWords', collection.shuffle()
+                collection = new Words(collection.where(type: word_type))
+              if collection.length is 0
+                Messenger().post
+                  message: 'There are no words'
+                  type: ''
+                @go 'home'
+              else
+                @go 'studyWords', collection.shuffle()
           onFailure: ->
             Messenger().post
               message: 'Please choose which type of words to study'
@@ -110,13 +116,12 @@ window.Views =
     initialize: (@params) ->
       @incorrect = 0
       @collection = @params.collection
-      @model = @collection.shift().clone()
-      if @model?
-        @wordTitle.changeTo @capitalize(@model.get('word'))
+      @model = @collection.shift()?.clone()
+      @initialize_form()
+      @wordTitle.changeTo @capitalize(@model.get('word'))
       @model.on 'change', (model) =>
         @wordTitle.changeTo @capitalize(model.get('word'))
         @initialize_form()
-      @initialize_form()
 
     initialize_form: ->
       definition = @model.get('definition')
@@ -159,19 +164,57 @@ window.Views =
           type: ''
         @go 'home'
 
-  editWords: class EditWords extends Marionette.Layout
-    template: Handlebars.compile $('#edit-words-view').html()
-    regions:
-      main: '#center-column'
+  editWords: class EditWords extends View
+    @content: (params) ->
+      @div id: 'content', =>
+        @div class: 'ui huge center aligned header', 'Edit'
+        @div class: 'ui center aligned three column grid', =>
+          @div class: 'column'
+          @div class: 'column', =>
+            @subview 'wordSection', new WordSection(params)
+          @div class: 'column'
 
-    render: ->
-      @$el.html @template()
-      collectionView = new EditWordsCollection(collection: @collection)
-      @main.show collectionView
-      searchView = new EditWordsSearch()
-        .on 'filterChange', (val) -> collectionView.filterBy(val)
-      @router().menu searchView
-      this
+class WordSection extends View
+  @content: ({collection}) ->
+    @div id: 'content', =>
+      collection.each (word) =>
+        @subview 'word', new EditWord(word)
+
+class EditWord extends View
+  @content: (@word) ->
+    @div class: 'ui form segment', =>
+      @div class: 'ui huge center header', @word.get('word')
+      @div class: 'field', =>
+        @div class: 'ui input', =>
+          @input id: 'definition-input',
+            type: 'text',
+            name: 'definition',
+            value: @word.get('definition'),
+            placeholder: 'Definition'
+      @div class: 'ui green submit mini button', 'Update'
+      @div class: 'ui red mini button', click: 'delete', 'Delete'
+
+  initialize: (@word) ->
+    rules =
+      definition:
+        identifier: 'definition'
+        rules: [
+          {
+            type: 'empty'
+            prompt: 'Need a definition'
+          }
+        ]
+
+    @form(rules, inline: true, on: 'submit')
+      .form 'setting',
+        onSuccess: =>
+          new_def = @form('get field', 'definition').val()
+          @word.save definition: new_def
+
+  delete: ->
+    @word.on 'destroy', (model, collection) =>
+      @hide()
+    @word.destroy()
 
 class AddWordsForm extends View
   @content: ->
@@ -246,71 +289,8 @@ class TypeDropdown extends View
             @div class: 'item', 'data-value': type.toLowerCase(), type
 
 class WordTitle extends View
-  @content: ({word}='') ->
-    @div class: 'ui teal medium center aligned header', 'swag'
+  @content: (word='') ->
+    @div class: 'ui teal medium center aligned header', word
 
   changeTo: (word) ->
     @html word
-
-class EditWordView extends Marionette.ItemView
-  template: Handlebars.compile $('#edit-word-view').html()
-  events:
-    'click .red.button': 'delete'
-
-  render: ->
-    @$el.html @template(@model.attributes)
-    @initialize_form()
-    this
-
-  initialize_form: ->
-    rules =
-      definition:
-        identifier: 'definition'
-        rules: [
-          {
-            type: 'empty'
-            prompt: 'Need a definition'
-          }
-        ]
-
-    $form = @$el.find('.ui.form').form(rules, inline: true, on: 'submit')
-    $form.form 'setting',
-      onSuccess: =>
-        new_def = $form.form('get field', 'definition').val()
-        @model.save definition: new_def
-
-  delete: (e) -> @model.destroy()
-
-class EditWordsCollection extends Marionette.CollectionView
-  itemView: EditWordView
-
-  initialize: -> @filteredBy = ''
-
-  # re-render when filter changes
-  filterBy: (val) ->
-    @filteredBy = val
-    @render()
-
-  # overriding Marionette.CollectionView method to only
-  #  show item if it passes filter set by user.
-  #  Essentially searching if word contains @filteredBy string
-  addItemView: (model) ->
-    return unless ~model.get('word').indexOf @filteredBy
-    super
-
-class EditWordsSearch extends Marionette.Layout
-  template: Handlebars.compile $('#edit-words-search-view').html()
-  events:
-    'input': (e) -> @trigger 'filterChange', $(e.target).val()
-    'click .home.item': (e) -> @router().go 'home'
-    'click .study.item': (e) -> @router().go 'studyWords'
-
-class TitleView extends Marionette.ItemView
-  template: Handlebars.compile "{{word}}"
-
-class ChooseWordsMenu extends Marionette.ItemView
-  template: Handlebars.compile "<i class='home icon'></i>Home"
-  tagName: 'a'
-  className: 'home item'
-  events:
-    'click': -> @router().go 'home'

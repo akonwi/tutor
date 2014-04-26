@@ -20,10 +20,10 @@ class Tutor extends Cosmo.Router
     if words?
       @render new Views.study(collection: words)
     else
-        @render new Views.preStudy
+      @render new Views.preStudy
 
   edit: ->
-    Tutor.lawnchair.all (words) =>
+    @get('lawnchair').all (words) =>
       words = new Words(words)
       @render new Views.editWords(collection: words)
 

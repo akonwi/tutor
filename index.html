@@ -15,7 +15,6 @@
     <script type='text/javascript' src="js/underscore.js"></script>
     <script type='text/javascript' src="js/backbone.js"></script>
     <script type='text/javascript' src="js/backbone.marionette.js"></script>
-    <script type='text/javascript' src="js/handlebars-v1.2.0.js"></script>
     <script type='text/javascript' src="js/semantic.js"></script>
     <script type='text/javascript' src="js/lawnchair.js"></script>
     <script type='text/javascript' src="js/lawnchair-query.js"></script>
@@ -27,33 +26,9 @@
     <script type='text/coffeescript' src="libs/views.coffee"></script>
     <script type='text/coffeescript' src="libs/cosmo.coffee"></script>
     <script type='text/coffeescript' src="main.coffee"></script>
-    <script src="http://localhost:3000/livereload.js"></script>
   </head>
   <body>
     <div id="container">
-
-      <script id='edit-words-view' type='handlebars'>
-        <div class="ui huge center aligned header">Edit</div>
-        <div class="ui center aligned three column grid">
-          <div class="column"></div>
-          <div class="column" id="center-column"></div>
-          <div class="column" id="search-column"></div>
-        </div>
-      </script>
-
-      <script id='edit-word-view' type='handlebars'>
-        <div class="ui form segment edit-word">
-          <div class="ui huge center header">{{word}}</div>
-          <div class="field">
-            <div class="ui input">
-              <input id="definition-input" type="text" name="definition" value="{{definition}}" placeholder="Definition">
-            </div>
-          </div>
-          <div class="ui green submit mini button">Update</div>
-          <div class="ui red mini button">Delete</div>
-        </div>
-      </script>
-
       <script id='edit-words-search-view' type='handlebars'>
         <div class="item">
           <div class="ui form">
