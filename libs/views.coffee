@@ -10,6 +10,8 @@ View::isString = (obj) ->
 View::capitalize = (word) ->
   word[0].toUpperCase() + word[1..-1].toLowerCase()
 
+View::menu = (view) -> Tutor.get('regions').sidebar.html view
+
 window.Views =
   home: class HomeView extends View
     @content: ->
@@ -75,25 +77,25 @@ window.Views =
 
       $dropdown = @find('.ui.selection.dropdown').dropdown()
       $form = @find('.ui.form')
-      $form.form(rules, on: 'submit')
-        .form 'setting',
-          onSuccess: =>
-            word_type = $dropdown.dropdown('get value')
-            Tutor.get('lawnchair').all (words) =>
-              collection = new Words(words)
-              unless word_type is 'all'
-                collection = new Words(collection.where(type: word_type))
-              if collection.length is 0
-                Messenger().post
-                  message: 'There are no words'
-                  type: ''
-                @go 'home'
-              else
-                @go 'studyWords', collection.shuffle()
-          onFailure: ->
-            Messenger().post
-              message: 'Please choose which type of words to study'
-              type: ''
+      $form.form rules, on: 'submit'
+      .form 'setting',
+        onSuccess: =>
+          word_type = $dropdown.dropdown('get value')
+          Tutor.get('lawnchair').all (words) =>
+            collection = new Words(words)
+            unless word_type is 'all'
+              collection = new Words(collection.where(type: word_type))
+            if collection.length is 0
+              Messenger().post
+                message: 'There are no words'
+                type: ''
+              @go 'home'
+            else
+              @go 'studyWords', collection.shuffle()
+        onFailure: ->
+          Messenger().post
+            message: 'Please choose which type of words to study'
+            type: ''
 
   study: class StudyView extends View
     @content: ->
@@ -174,6 +176,8 @@ window.Views =
             @subview 'wordSection', new WordSection(params)
           @div class: 'column'
 
+    initialize: -> @menu new EditWordsMenu
+
 class WordSection extends View
   @content: ({collection}) ->
     @div id: 'content', =>
@@ -215,6 +219,31 @@ class EditWord extends View
     @word.on 'destroy', (model, collection) =>
       @hide()
     @word.destroy()
+
+class EditWordsMenu extends View
+  @content: ->
+    @div id: 'content', =>
+      @div class: 'item', =>
+        @div class: 'ui form', =>
+          @div class: 'field', =>
+            @div class: 'ui small icon input', =>
+              @input id: 'search-input',
+                type: 'text',
+                name: 'search',
+                placeholder: 'Search'
+              @i class: 'search icon'
+      @a class: 'item', click: 'goHome', =>
+        @raw "<i class='home icon'></i>Home"
+      @a class: 'item', click: 'goStudy', =>
+        @raw "<i class='pencil icon'></i>Study"
+
+  goHome: ->
+    @menu ''
+    @go 'home'
+
+  goStudy: ->
+    @menu ''
+    @go 'studyWords'
 
 class AddWordsForm extends View
   @content: ->
