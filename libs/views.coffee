@@ -176,13 +176,26 @@ window.Views =
             @subview 'wordSection', new WordSection(params)
           @div class: 'column'
 
-    initialize: -> @menu new EditWordsMenu
+    initialize: -> @menu new EditWordsMenu(@wordSection)
 
 class WordSection extends View
   @content: ({collection}) ->
+    # collection of subviews for each word to edit
+    @subViews = []
     @div id: 'content', =>
       collection.each (word) =>
-        @subview 'word', new EditWord(word)
+        view = new EditWord(word)
+        @subViews.push view
+        @subview 'word', view
+
+  initialize: ->
+    # filter which words are shown based on user input
+    @on 'filterChange', (e, query) =>
+      for view in @constructor.subViews
+        if ~view.word.get('word').indexOf query
+          view.show()
+        else
+          view.hide()
 
 class EditWord extends View
   @content: (@word) ->
@@ -236,6 +249,13 @@ class EditWordsMenu extends View
         @raw "<i class='home icon'></i>Home"
       @a class: 'item', click: 'goStudy', =>
         @raw "<i class='pencil icon'></i>Study"
+
+  # given the view that is displaying words,
+  # trigger updating filter as user types query
+  initialize: (wordSection) ->
+    searchInput = @find('input')
+    .on 'input', =>
+      wordSection.trigger 'filterChange', searchInput.val()
 
   goHome: ->
     @menu ''
