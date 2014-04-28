@@ -141,19 +141,19 @@ window.Views =
           ]
 
       $form = @find('.ui.form').form(rules, inline: true, on: 'submit')
-        .form 'setting',
-          onSuccess: =>
+      .form 'setting',
+        onSuccess: =>
+          @showNext()
+        onFailure: =>
+          if @incorrect is 2
+            console.log
+            @incorrect = 0
+            Messenger().post
+              message: "The answer is #{definition}"
+              type: ''
             @showNext()
-          onFailure: =>
-            if @incorrect is 2
-              console.log
-              @incorrect = 0
-              Messenger().post
-                message: "The answer is #{definition}"
-                type: ''
-              @showNext()
-            else
-              @incorrect++
+          else
+            @incorrect++
 
     showNext: ->
       @incorrect = 0
@@ -222,16 +222,15 @@ class EditWord extends View
           }
         ]
 
-    @form(rules, inline: true, on: 'submit')
-      .form 'setting',
-        onSuccess: =>
-          new_def = @form('get field', 'definition').val()
-          @word.save definition: new_def
+    @form rules, inline: true, on: 'submit'
+    .form 'setting',
+      onSuccess: =>
+        new_def = @form('get field', 'definition').val()
+        @word.save definition: new_def
 
   delete: ->
-    @word.on 'destroy', (model, collection) =>
-      @hide()
     @word.destroy()
+    @hide()
 
 class EditWordsMenu extends View
   @content: ->

@@ -27,9 +27,6 @@ class Tutor extends Cosmo.Router
       words = new Words(words)
       @render new Views.editWords(collection: words)
 
-  render: (view) ->
-    @regions.container.html view
-
   menu: (view) ->
     @regions.sidebar.html view
 
