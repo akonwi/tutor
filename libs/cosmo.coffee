@@ -4,22 +4,13 @@ window.Cosmo = {}
 class Cosmo.Router
   # app regions, assumes main content goes in a div#container
   regions:
-    container: '#container'
-
-  constructor: -> @initializers = []
+    container: $('#container')
 
   initialize: ->
-
-  # pass a block of code to run on ::start call
-  # TODO: remove?
-  init: (toDo) ->
-    @initializers.push toDo
-    this
 
   # do initialization stuff and then start app routing
   # TODO: Do some url management
   start: ->
-    init.apply(this) for init in @initializers
     @initialize()
     @go 'home'
     this
