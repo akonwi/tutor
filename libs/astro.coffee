@@ -1,7 +1,7 @@
-window.Cosmo = {}
+window.Astro = {}
 
 # All apps should be an extended instance of this class
-class Cosmo.Router
+class Astro.Router
   # app regions, assumes main content goes in a div#container
   regions:
     container: $('#container')

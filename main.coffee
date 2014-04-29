@@ -2,7 +2,7 @@ Messenger.options =
   extraClasses: 'messenger-fixed messenger-on-top'
   theme: 'ice'
 
-class Tutor extends Cosmo.Router
+class Tutor extends Astro.Router
   initialize: ->
     @addRegions
       container: '#container'
