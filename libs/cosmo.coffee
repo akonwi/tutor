@@ -1,7 +1,7 @@
-window.Astro = {}
+window.Cosmo = {}
 
 # All apps should be an extended instance of this class
-class Astro.Router
+class Cosmo.Router
   # app regions, assumes main content goes in a div#container
   regions:
     container: $('#container')
@@ -9,7 +9,7 @@ class Astro.Router
   initialize: ->
 
   # do initialization stuff and then start app routing
-  # TODO: Do some url management
+  # TODO: Do some url management instead of going 'home'
   start: ->
     @initialize()
     @go 'home'
