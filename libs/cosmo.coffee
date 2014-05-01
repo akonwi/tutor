@@ -40,4 +40,5 @@ class Cosmo.Router
     else
       @home()
 
-  render: (view) -> @regions.container.html view
+  render: (view) ->
+    @regions.container.html view

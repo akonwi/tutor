@@ -5,12 +5,14 @@ Messenger.options =
 class Tutor extends Cosmo.Router
   initialize: ->
     @addRegions
-      container: '#container'
       sidebar: '#side-menu'
     @set 'lawnchair', new Lawnchair(name: 'words', record: 'word')
     @get 'lawnchair'
     .all (words) =>
       @set 'words', new Words(words)
+
+    # setup semantic sidebar
+    @regions.sidebar.sidebar().toggle()
 
   home: -> @render new Views.home
 
@@ -32,7 +34,12 @@ class Tutor extends Cosmo.Router
           message: "There are no words to edit"
           type: ''
 
-  menu: (view) ->
-    @regions.sidebar.html view
+  # if no view, hide the sidebar
+  menu: (view=null) ->
+    if view is null
+      @regions.sidebar.hide()
+    else
+      @regions.sidebar.html view
+      @regions.sidebar.show()
 
 window.Tutor = new Tutor().start()

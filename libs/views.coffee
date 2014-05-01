@@ -10,7 +10,7 @@ View::isString = (obj) ->
 View::capitalize = (word) ->
   word[0].toUpperCase() + word[1..-1].toLowerCase()
 
-View::menu = (view) -> Tutor.get('regions').sidebar.html view
+View::menu = (view) -> Tutor.menu(view)
 
 window.Views =
   home: class HomeView extends View
@@ -49,6 +49,8 @@ window.Views =
             @subview 'addWordsForm', new AddWordsForm
           @div class: 'column'
 
+    initialize: -> @menu new AddWordsMenu
+
   preStudy: class ChooseWordsView extends View
     @content: ->
       @div id: 'content', =>
@@ -63,6 +65,7 @@ window.Views =
           @div class: 'column'
 
     initialize: ->
+      @menu new StudyMenu
       # first add 'All' option to dropdown
       @typeDropdown.find('.menu').prepend $$ ->
         @div class: 'item', 'data-value': 'all', 'All'
@@ -246,6 +249,8 @@ class EditWordsMenu extends View
               @i class: 'search icon'
       @a class: 'item', click: 'goHome', =>
         @raw "<i class='home icon'></i>Home"
+      @a class: 'item', click: 'goAdd', =>
+        @raw "<i class='add icon'></i>Add Words"
       @a class: 'item', click: 'goStudy', =>
         @raw "<i class='pencil icon'></i>Study"
 
@@ -257,11 +262,47 @@ class EditWordsMenu extends View
       wordSection.trigger 'filterChange', searchInput.val()
 
   goHome: ->
-    @menu ''
+    @menu()
+    @go 'home'
+
+  goAdd: ->
+    @menu()
+    @go 'addWords'
+
+  goStudy: ->
+    @menu()
+    @go 'studyWords'
+
+class StudyMenu extends View
+  @content: ->
+    @div id: 'content', =>
+      @a class: 'item', click: 'goHome', =>
+        @raw "<i class='home icon'></i>Home"
+      @a class: 'item', click: 'goAdd', =>
+        @raw "<i class='add icon'></i>Add Words"
+
+  goHome: ->
+    @menu()
+    @go 'home'
+
+  goAdd: ->
+    @menu()
+    @go 'addWords'
+
+class AddWordsMenu extends View
+  @content: ->
+    @div id: 'content', =>
+      @a class: 'item', click: 'goHome', =>
+        @raw "<i class='home icon'></i>Home"
+      @a class: 'item', click: 'goStudy', =>
+        @raw "<i class='pencil icon'></i>Study"
+
+  goHome: ->
+    @menu()
     @go 'home'
 
   goStudy: ->
-    @menu ''
+    @menu()
     @go 'studyWords'
 
 class AddWordsForm extends View
