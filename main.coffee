@@ -24,8 +24,13 @@ class Tutor extends Cosmo.Router
 
   edit: ->
     @get('lawnchair').all (words) =>
-      words = new Words(words)
-      @render new Views.editWords(collection: words)
+      if words.length
+        words = new Words(words)
+        @render new Views.editWords(collection: words)
+      else
+        Messenger().post
+          message: "There are no words to edit"
+          type: ''
 
   menu: (view) ->
     @regions.sidebar.html view

@@ -1,4 +1,5 @@
-window.Cosmo = {}
+window.Cosmo =
+  version: '0.1.0'
 
 # All apps should be an extended instance of this class
 class Cosmo.Router
@@ -9,7 +10,7 @@ class Cosmo.Router
   initialize: ->
 
   # do initialization stuff and then start app routing
-  # TODO: Do some url management instead of going 'home'
+  # TODO: Do some url management
   start: ->
     @initialize()
     @go 'home'
