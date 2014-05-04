@@ -1,15 +1,6 @@
 {
   "name": "Tutor",
-  "main": "index.html",
-  "window": {
-    "toolbar": true,
-    "title": "Tutor"
-  },
-  "dependencies": {
-    "coffee-script": "*",
-    "nedb": "~0.9.3",
-    "backbone.nedb": "0.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.4",
     "grunt-contrib-coffee": "~0.10.1",
