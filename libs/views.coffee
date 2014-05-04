@@ -84,7 +84,7 @@ window.Views =
       .form 'setting',
         onSuccess: =>
           word_type = $dropdown.dropdown('get value')
-          Tutor.get('lawnchair').all (words) =>
+          Tutor.get('db').all (words) =>
             collection = new Words(words)
             unless word_type is 'all'
               collection = new Words(collection.where(type: word_type))
