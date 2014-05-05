@@ -124,9 +124,9 @@ window.Views =
       @model = @collection.shift()?.clone()
       @initialize_form()
       @wordTitle.changeTo @capitalize(@model.get('word'))
-      @model.on 'change', (model) =>
-        @wordTitle.changeTo @capitalize(model.get('word'))
-        @initialize_form()
+      # @model.on 'change', (model) =>
+      #   @wordTitle.changeTo @capitalize(model.get('word'))
+      #   @initialize_form()
 
     initialize_form: ->
       definition = @model.get('definition')
@@ -149,7 +149,6 @@ window.Views =
           @showNext()
         onFailure: =>
           if @incorrect is 2
-            console.log
             @incorrect = 0
             Messenger().post
               message: "The answer is #{definition}"

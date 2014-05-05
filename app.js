@@ -836,13 +836,7 @@ window.Views = {
       this.collection = this.params.collection;
       this.model = (_ref = this.collection.shift()) != null ? _ref.clone() : void 0;
       this.initialize_form();
-      this.wordTitle.changeTo(this.capitalize(this.model.get('word')));
-      return this.model.on('change', (function(_this) {
-        return function(model) {
-          _this.wordTitle.changeTo(_this.capitalize(model.get('word')));
-          return _this.initialize_form();
-        };
-      })(this));
+      return this.wordTitle.changeTo(this.capitalize(this.model.get('word')));
     };
 
     StudyView.prototype.initialize_form = function() {
@@ -874,7 +868,6 @@ window.Views = {
         onFailure: (function(_this) {
           return function() {
             if (_this.incorrect === 2) {
-              console.log;
               _this.incorrect = 0;
               Messenger().post({
                 message: "The answer is " + definition,
@@ -1441,48 +1434,203 @@ WordTitle = (function(_super) {
 
 })(View);
 
-var Word, Words,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Word, Words, clone, isArray, random, shuffle;
 
-window.Word = Word = (function(_super) {
-  __extends(Word, _super);
+clone = function(obj) {
+  var key, twin, value;
+  twin = null;
+  if (isArray(obj)) {
+    twin = obj.slice();
+  } else {
+    twin = {};
+    for (key in obj) {
+      value = obj[key];
+      twin[key] = value;
+    }
+  }
+  return twin;
+};
 
-  function Word() {
-    return Word.__super__.constructor.apply(this, arguments);
+isArray = function(obj) {
+  return toString.call(obj).indexOf('Array') !== -1;
+};
+
+random = function(min, max) {
+  if (max == null) {
+    max = min;
+    min = 0;
+  }
+  return min + Math.floor(Math.random() * (max - min + 1));
+};
+
+shuffle = function(array) {
+  var index, obj, rand, shuffled, _i, _len;
+  shuffled = [];
+  for (index = _i = 0, _len = array.length; _i < _len; index = ++_i) {
+    obj = array[index];
+    rand = random(index++);
+    shuffled[index - 1] = shuffled[rand];
+    shuffled[rand] = obj;
+  }
+  return shuffled;
+};
+
+window.Word = Word = (function() {
+  Word.prototype.toAttributes = {
+    id: function() {
+      return this.get('word');
+    }
+  };
+
+  function Word(attributes) {
+    this.attributes = attributes != null ? attributes : {};
   }
 
-  Word.prototype.idAttribute = 'word';
+  Word.prototype.set = function(attr, val) {
+    var key;
+    if (typeof attr === 'object') {
+      for (key in attr) {
+        val = attr[key];
+        this.attributes[key] = val;
+      }
+    } else {
+      this.attributes[attr] = val;
+    }
+    return void 0;
+  };
 
-  Word.prototype.sync = function(method, model, options) {
-    if ((method === 'create') || (method === 'update')) {
-      console.log("" + method + " word", model);
-      Tutor.get('db').set(model.toJSON(), function(err) {
-        if (err != null) {
-          return typeof options.error === "function" ? options.error(model) : void 0;
-        } else {
-          return typeof options.success === "function" ? options.success(model) : void 0;
-        }
-      });
-    }
-    if (method === 'delete') {
-      return Tutor.get('db').remove(model.get('id'));
-    }
+  Word.prototype.get = function(attr) {
+    return this.attributes[attr] || this.toAttributes[attr].call(this);
+  };
+
+  Word.prototype.clone = function() {
+    return new this.constructor(clone(this.attributes));
+  };
+
+  Word.prototype.toJSON = function() {
+    return clone(this.attributes);
+  };
+
+  Word.prototype.save = function(attr, val, options) {
+    this.set(attr, val);
+    return Tutor.get('db').set(this.toJSON(), function(err) {
+      if (err != null) {
+        return typeof options.error === "function" ? options.error(model) : void 0;
+      } else {
+        return typeof options.success === "function" ? options.success(model) : void 0;
+      }
+    });
+  };
+
+  Word.prototype.destroy = function() {
+    return Tutor.get('db').remove(this.get('id'));
   };
 
   return Word;
 
-})(Backbone.Model);
+})();
 
-window.Words = Words = (function(_super) {
-  __extends(Words, _super);
+window.Words = Words = (function() {
+  Words.prototype.length = 0;
 
-  function Words() {
-    return Words.__super__.constructor.apply(this, arguments);
+  function Words(collection) {
+    var word, _i, _len;
+    if (collection == null) {
+      collection = [];
+    }
+    this.collection = [];
+    for (_i = 0, _len = collection.length; _i < _len; _i++) {
+      word = collection[_i];
+      this.collection.push(new Word(word));
+    }
+    this.length = this.collection.length;
   }
 
-  Words.prototype.model = Word;
+  Words.prototype.each = function(callback) {
+    var word, _i, _len, _ref, _results;
+    console.log("this is", this);
+    console.log("callback is", callback);
+    _ref = this.collection;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      word = _ref[_i];
+      _results.push(callback.call(this, word));
+    }
+    return _results;
+  };
+
+  Words.prototype.first = function() {
+    return this.collection[0];
+  };
+
+  Words.prototype.last = function() {
+    return this.collection[this.collection.length - 1];
+  };
+
+  Words.prototype.where = function(query) {
+    var attr, match, results, value, word, _i, _len, _ref;
+    if (query == null) {
+      query = {};
+    }
+    results = [];
+    if (query === {}) {
+      return results;
+    } else {
+      _ref = this.collection;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        word = _ref[_i];
+        match = true;
+        for (attr in query) {
+          value = query[attr];
+          if (word.get(attr) !== value) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          results.push(word);
+        }
+      }
+      return results;
+    }
+  };
+
+  Words.prototype.findWhere = function(query) {
+    if (query == null) {
+      query = {};
+    }
+    return this.where(query)[0];
+  };
+
+  Words.prototype.shift = function() {
+    var length;
+    length = this.collection.length - 1;
+    return this.collection.shift();
+  };
+
+  Words.prototype.shuffle = function() {
+    var shuffled, toShuffle, word, _i, _len, _ref;
+    toShuffle = [];
+    _ref = this.collection;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      word = _ref[_i];
+      toShuffle.push(word.toJSON());
+    }
+    shuffled = shuffle(toShuffle);
+    return new this.constructor(shuffled);
+  };
+
+  Words.prototype._isEmpty = function(obj) {
+    var empty, key, value;
+    empty = true;
+    for (key in obj) {
+      value = obj[key];
+      empty = false;
+      break;
+    }
+    return empty;
+  };
 
   return Words;
 
-})(Backbone.Collection);
+})();
