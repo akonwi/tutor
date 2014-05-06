@@ -836,7 +836,13 @@ window.Views = {
       this.collection = this.params.collection;
       this.model = (_ref = this.collection.shift()) != null ? _ref.clone() : void 0;
       this.initialize_form();
-      return this.wordTitle.changeTo(this.capitalize(this.model.get('word')));
+      this.wordTitle.changeTo(this.capitalize(this.model.get('word')));
+      return this.model.on('change', (function(_this) {
+        return function(model) {
+          _this.wordTitle.changeTo(_this.capitalize(model.get('word')));
+          return _this.initialize_form();
+        };
+      })(this));
     };
 
     StudyView.prototype.initialize_form = function() {
@@ -862,6 +868,7 @@ window.Views = {
       }).form('setting', {
         onSuccess: (function(_this) {
           return function() {
+            _this.incorrect = 0;
             return _this.showNext();
           };
         })(this),
@@ -1434,7 +1441,16 @@ WordTitle = (function(_super) {
 
 })(View);
 
-var Word, Words, clone, isArray, random, shuffle;
+var Word, Words, clone, extend, idCount, implementation, isArray, listenMethods, method, random, shuffle, uniqueId;
+
+extend = function(source, dest) {
+  var key, value;
+  for (key in dest) {
+    value = dest[key];
+    source[key] = value;
+  }
+  return null;
+};
 
 clone = function(obj) {
   var key, twin, value;
@@ -1475,6 +1491,107 @@ shuffle = function(array) {
   return shuffled;
 };
 
+idCount = 0;
+
+uniqueId = function(prefix) {
+  var id;
+  id = ++idCounter + '';
+  if (prefix) {
+    return prefix + id;
+  } else {
+    return id;
+  }
+};
+
+Cosmo.Events = {
+  on: function(name, callback, context) {
+    var todos;
+    if (callback == null) {
+      callback = this;
+    }
+    this.events = this.events || {};
+    todos = this.events[name] || [];
+    todos.push({
+      callback: callback,
+      context: context
+    });
+    this.events[name] = todos;
+    return this;
+  },
+  once: function(name, callback, context) {
+    var single;
+    single = (function(_this) {
+      return function() {
+        _this.off(name, callback);
+        return callback.apply(_this, arguments);
+      };
+    })(this);
+    single.callback = callback;
+    return this.on(name, single);
+  },
+  off: function(name, callback) {
+    var toKeep, todo, todos, _i, _len;
+    if (name == null) {
+      name = null;
+    }
+    if (callback == null) {
+      callback = null;
+    }
+    if (name === null) {
+      this.events = {};
+    } else if (callback === null) {
+      delete this.events[name];
+    } else {
+      toKeep = [];
+      todos = this.events[name];
+      for (_i = 0, _len = todos.length; _i < _len; _i++) {
+        todo = todos[_i];
+        if (todo.callback === !callback) {
+          toKeep.push(todo);
+        }
+      }
+      if (!toKeep.length) {
+        delete this.events[name];
+      } else {
+        this.events[name] = toKeep;
+      }
+    }
+    return this;
+  },
+  trigger: function(event) {
+    var callback, context, _i, _len, _ref, _ref1, _ref2;
+    if (!((_ref = this.events) != null ? _ref[event] : void 0)) {
+      return;
+    }
+    _ref1 = this.events[event];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      _ref2 = _ref1[_i], callback = _ref2.callback, context = _ref2.context;
+      callback.call(context, this);
+    }
+    return this;
+  }
+};
+
+listenMethods = {
+  listenTo: 'on',
+  listenToOnce: 'once'
+};
+
+for (method in listenMethods) {
+  implementation = listenMethods[method];
+  Cosmo.Events[method] = function(obj, name, callback) {
+    var id;
+    this.listeningTo = this.listeningTo || {};
+    id = obj.listenId = uniqueId('l');
+    this.listeningTo[id] = obj;
+    if ((!callback) && (typeof name === 'object')) {
+      callback = this;
+    }
+    obj[implementation](name, callback, this);
+    return this;
+  };
+}
+
 window.Word = Word = (function() {
   Word.prototype.toAttributes = {
     id: function() {
@@ -1484,6 +1601,7 @@ window.Word = Word = (function() {
 
   function Word(attributes) {
     this.attributes = attributes != null ? attributes : {};
+    extend(this, Cosmo.Events);
   }
 
   Word.prototype.set = function(attr, val) {
@@ -1492,10 +1610,13 @@ window.Word = Word = (function() {
       for (key in attr) {
         val = attr[key];
         this.attributes[key] = val;
+        this.trigger("change " + key);
       }
     } else {
       this.attributes[attr] = val;
+      this.trigger("change " + attr);
     }
+    this.trigger('change');
     return void 0;
   };
 

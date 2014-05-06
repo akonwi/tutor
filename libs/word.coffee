@@ -1,3 +1,10 @@
+## helper functions
+# very shallow merge
+extend = (source, dest) ->
+  for key, value of dest
+    source[key] = value
+  null
+
 clone = (obj)->
   twin = null
   if isArray obj
@@ -25,18 +32,74 @@ shuffle = (array) ->
     shuffled[rand] = obj
   shuffled
 
+idCount = 0
+uniqueId = (prefix) ->
+  id = ++idCounter + ''
+  if prefix then prefix + id else id
+
+## Events mixin
+#  largely copied from Backbone
+Cosmo.Events =
+  on: (name, callback=this, context) ->
+    @events = @events or {}
+    todos = @events[name] or []
+    todos.push {callback, context}
+    @events[name] = todos
+    this
+
+  once: (name, callback, context) ->
+    single = =>
+      @off name, callback
+      callback.apply this, arguments
+
+    single.callback = callback
+    @on name, single
+
+  off: (name=null, callback=null) ->
+    if name is null
+      @events = {}
+    else if callback is null
+      delete @events[name]
+    else
+      toKeep = []
+      todos = @events[name]
+      for todo in todos
+        toKeep.push todo if todo.callback is not callback
+      if not toKeep.length then delete @events[name] else @events[name] = toKeep
+    this
+
+  trigger: (event) ->
+    return if not @events?[event]
+    for {callback, context} in @events[event]
+      callback.call context, this
+    this
+
+listenMethods = {listenTo: 'on', listenToOnce: 'once'}
+
+for method, implementation of listenMethods
+  Cosmo.Events[method] = (obj, name, callback) ->
+    @listeningTo = @listeningTo or {}
+    id = obj.listenId = uniqueId('l')
+    @listeningTo[id] = obj
+    callback = this if (not callback) and (typeof name is 'object')
+    obj[implementation](name, callback, this)
+    this
+
 window.Word = class Word
   toAttributes:
     id: -> @get('word')
 
-  constructor: (@attributes={}) ->
+  constructor: (@attributes={}) -> extend(this, Cosmo.Events)
 
   set: (attr, val) ->
     if typeof attr is 'object'
       for key, val of attr
         @attributes[key] = val
+        @trigger "change #{key}"
     else
       @attributes[attr] = val
+      @trigger "change #{attr}"
+    @trigger 'change'
     undefined
 
   get: (attr) -> @attributes[attr] or @toAttributes[attr].call(this)

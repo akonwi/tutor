@@ -124,9 +124,9 @@ window.Views =
       @model = @collection.shift()?.clone()
       @initialize_form()
       @wordTitle.changeTo @capitalize(@model.get('word'))
-      # @model.on 'change', (model) =>
-      #   @wordTitle.changeTo @capitalize(model.get('word'))
-      #   @initialize_form()
+      @model.on 'change', (model) =>
+        @wordTitle.changeTo @capitalize(model.get('word'))
+        @initialize_form()
 
     initialize_form: ->
       definition = @model.get('definition')
@@ -146,6 +146,7 @@ window.Views =
       $form = @find('.ui.form').form(rules, inline: true, on: 'submit')
       .form 'setting',
         onSuccess: =>
+          @incorrect = 0
           @showNext()
         onFailure: =>
           if @incorrect is 2
