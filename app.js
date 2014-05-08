@@ -463,11 +463,21 @@ Cosmo.Router = (function() {
 
 })();
 
-var Store, runtime, storage;
+var Store, runtime, storage, toArray;
 
 storage = chrome.storage.local;
 
 runtime = chrome.runtime;
+
+toArray = function(obj) {
+  var array, key, value;
+  array = [];
+  for (key in obj) {
+    value = obj[key];
+    array.push(value);
+  }
+  return array;
+};
 
 window.Store = Store = (function() {
   function Store() {}
@@ -492,7 +502,7 @@ window.Store = Store = (function() {
 
   Store.prototype.get = function(key, func) {
     return storage.get(key, function(results) {
-      return func.call(this, _.toArray(results));
+      return func.call(this, toArray(results));
     });
   };
 
@@ -504,7 +514,7 @@ window.Store = Store = (function() {
 
   Store.prototype.all = function(func) {
     return storage.get(null, function(items) {
-      return func.call(this, _.toArray(items));
+      return func.call(this, toArray(items));
     });
   };
 
@@ -914,7 +924,7 @@ window.Views = {
       return EditWords.__super__.constructor.apply(this, arguments);
     }
 
-    EditWords.content = function(params) {
+    EditWords.content = function(collection) {
       return this.div({
         id: 'content'
       }, (function(_this) {
@@ -931,7 +941,7 @@ window.Views = {
             _this.div({
               "class": 'column'
             }, function() {
-              return _this.subview('wordSection', new WordSection(params));
+              return _this.subview('wordSection', new WordSection(collection));
             });
             return _this.div({
               "class": 'column'
@@ -957,9 +967,7 @@ WordSection = (function(_super) {
     return WordSection.__super__.constructor.apply(this, arguments);
   }
 
-  WordSection.content = function(_arg) {
-    var collection;
-    collection = _arg.collection;
+  WordSection.content = function(collection) {
     this.subViews = [];
     return this.div({
       id: 'content'
@@ -1346,8 +1354,10 @@ AddWordsForm = (function(_super) {
           if (_this.isString(attr.type)) {
             attr.word = _this.form('get field', 'word').val();
             attr.definition = _this.form('get field', 'definition').val();
-            return word = new Word(attr).save({}, {
+            word = new Word(attr);
+            return word.save({
               success: function(model) {
+                console.log('do it');
                 _this.form('get field', 'word').val('');
                 _this.form('get field', 'definition').val('');
                 return _this.find('#word-input').focus();
@@ -1441,7 +1451,7 @@ WordTitle = (function(_super) {
 
 })(View);
 
-var Word, Words, clone, extend, idCount, implementation, isArray, listenMethods, method, random, shuffle, uniqueId;
+var Word, Words, clone, extend, idCount, isArray, random, shuffle, uniqueId;
 
 extend = function(source, dest) {
   var key, value;
@@ -1506,8 +1516,8 @@ uniqueId = function(prefix) {
 Cosmo.Events = {
   on: function(name, callback, context) {
     var todos;
-    if (callback == null) {
-      callback = this;
+    if (context == null) {
+      context = this;
     }
     this.events = this.events || {};
     todos = this.events[name] || [];
@@ -1569,28 +1579,28 @@ Cosmo.Events = {
       callback.call(context, this);
     }
     return this;
-  }
-};
-
-listenMethods = {
-  listenTo: 'on',
-  listenToOnce: 'once'
-};
-
-for (method in listenMethods) {
-  implementation = listenMethods[method];
-  Cosmo.Events[method] = function(obj, name, callback) {
+  },
+  listenTo: function(obj, name, callback, context) {
     var id;
+    if (context == null) {
+      context = this;
+    }
     this.listeningTo = this.listeningTo || {};
     id = obj.listenId = uniqueId('l');
     this.listeningTo[id] = obj;
-    if ((!callback) && (typeof name === 'object')) {
-      callback = this;
+    return obj.on(name, callback, context);
+  },
+  listenToOnce: function(obj, name, callback, context) {
+    var id;
+    if (context == null) {
+      context = this;
     }
-    obj[implementation](name, callback, this);
-    return this;
-  };
-}
+    this.listeningTo = this.listeningTo || {};
+    id = obj.listenId = uniqueId('l');
+    this.listeningTo[id] = obj;
+    return obj.once(name, callback, context);
+  }
+};
 
 window.Word = Word = (function() {
   Word.prototype.toAttributes = {
@@ -1632,19 +1642,24 @@ window.Word = Word = (function() {
     return clone(this.attributes);
   };
 
-  Word.prototype.save = function(attr, val, options) {
-    this.set(attr, val);
-    return Tutor.get('db').set(this.toJSON(), function(err) {
-      if (err != null) {
-        return typeof options.error === "function" ? options.error(model) : void 0;
-      } else {
-        return typeof options.success === "function" ? options.success(model) : void 0;
-      }
-    });
+  Word.prototype.save = function(_arg) {
+    var error, success;
+    success = _arg.success, error = _arg.error;
+    return Tutor.get('db').set(this.toJSON(), (function(_this) {
+      return function(err) {
+        if (error) {
+          return error != null ? error.call(_this, _this) : void 0;
+        } else {
+          _this.trigger('save');
+          return success != null ? success.call(_this, _this) : void 0;
+        }
+      };
+    })(this));
   };
 
   Word.prototype.destroy = function() {
-    return Tutor.get('db').remove(this.get('id'));
+    Tutor.get('db').remove(this.get('id'));
+    return this.trigger('destroy');
   };
 
   return Word;
@@ -1659,18 +1674,19 @@ window.Words = Words = (function() {
     if (collection == null) {
       collection = [];
     }
+    extend(this, Cosmo.Events);
     this.collection = [];
     for (_i = 0, _len = collection.length; _i < _len; _i++) {
       word = collection[_i];
-      this.collection.push(new Word(word));
+      word = new Word(word);
+      this.listenTo(word, 'destroy', this.remove, this);
+      this.collection.push(word);
     }
     this.length = this.collection.length;
   }
 
   Words.prototype.each = function(callback) {
     var word, _i, _len, _ref, _results;
-    console.log("this is", this);
-    console.log("callback is", callback);
     _ref = this.collection;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1723,10 +1739,33 @@ window.Words = Words = (function() {
     return this.where(query)[0];
   };
 
+  Words.prototype.remove = function(word) {
+    var model, toKeep, _i, _len, _ref;
+    toKeep = [];
+    _ref = this.collection;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      model = _ref[_i];
+      if (word === !model) {
+        toKeep.push(model);
+      }
+    }
+    this.collection = toKeep;
+    this.length = this.collection.length;
+    return this.trigger('change');
+  };
+
+  Words.prototype.push = function(word) {
+    this.listenTo(word, 'destroy', this.remove);
+    this.collection.push(word);
+    this.length = this.collection.length;
+    return this.trigger('change');
+  };
+
   Words.prototype.shift = function() {
     var length;
     length = this.collection.length - 1;
-    return this.collection.shift();
+    this.collection.shift();
+    return this.trigger('change');
   };
 
   Words.prototype.shuffle = function() {

@@ -40,7 +40,7 @@ uniqueId = (prefix) ->
 ## Events mixin
 #  largely copied from Backbone
 Cosmo.Events =
-  on: (name, callback=this, context) ->
+  on: (name, callback, context=this) ->
     @events = @events or {}
     todos = @events[name] or []
     todos.push {callback, context}
@@ -74,16 +74,17 @@ Cosmo.Events =
       callback.call context, this
     this
 
-listenMethods = {listenTo: 'on', listenToOnce: 'once'}
-
-for method, implementation of listenMethods
-  Cosmo.Events[method] = (obj, name, callback) ->
+  listenTo: (obj, name, callback, context=this) ->
     @listeningTo = @listeningTo or {}
     id = obj.listenId = uniqueId('l')
     @listeningTo[id] = obj
-    callback = this if (not callback) and (typeof name is 'object')
-    obj[implementation](name, callback, this)
-    this
+    obj.on name, callback, context
+
+  listenToOnce: (obj, name, callback, context=this) ->
+    @listeningTo = @listeningTo or {}
+    id = obj.listenId = uniqueId('l')
+    @listeningTo[id] = obj
+    obj.once name, callback, context
 
 window.Word = class Word
   toAttributes:
@@ -108,28 +109,32 @@ window.Word = class Word
 
   toJSON: -> clone(@attributes)
 
-  save: (attr, val, options) ->
-    @set attr, val
-    Tutor.get('db').set @toJSON(), (err) ->
-      if err?
-        options.error?(model)
+  save: ({success, error}) ->
+    Tutor.get('db').set @toJSON(), (err) =>
+      if error
+        error?.call this, this
       else
-        options.success?(model)
+        @trigger 'save'
+        success?.call this, this
 
-  destroy: -> Tutor.get('db').remove @get('id')
+  destroy: ->
+    Tutor.get('db').remove @get('id')
+    @trigger 'destroy'
 
 window.Words = class Words
   length: 0
 
   constructor: (collection=[]) ->
+    extend this, Cosmo.Events
     @collection = []
     for word in collection
-      @collection.push new Word(word)
+      word = new Word(word)
+      # TODO: work on whole context thing
+      @listenTo word, 'destroy', @remove, this
+      @collection.push word
     @length = @collection.length
 
   each: (callback) ->
-    console.log "this is", this
-    console.log "callback is", callback
     for word in @collection
       callback.call(this, word)
 
@@ -154,9 +159,24 @@ window.Words = class Words
   findWhere: (query={}) ->
     @where(query)[0]
 
+  remove: (word) ->
+    toKeep = []
+    for model in @collection
+      toKeep.push model if word is not model
+    @collection = toKeep
+    @length = @collection.length
+    @trigger 'change'
+
+  push: (word) ->
+    @listenTo word, 'destroy', @remove
+    @collection.push word
+    @length = @collection.length
+    @trigger 'change'
+
   shift: ->
     length = @collection.length - 1
     @collection.shift()
+    @trigger 'change'
 
   shuffle: ->
     toShuffle = []

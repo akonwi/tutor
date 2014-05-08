@@ -170,19 +170,19 @@ window.Views =
         @go 'home'
 
   editWords: class EditWords extends View
-    @content: (params) ->
+    @content: (collection) ->
       @div id: 'content', =>
         @div class: 'ui huge center aligned header', 'Edit'
         @div class: 'ui center aligned three column grid', =>
           @div class: 'column'
           @div class: 'column', =>
-            @subview 'wordSection', new WordSection(params)
+            @subview 'wordSection', new WordSection(collection)
           @div class: 'column'
 
     initialize: -> @menu new EditWordsMenu(@wordSection)
 
 class WordSection extends View
-  @content: ({collection}) ->
+  @content: (collection) ->
     # collection of subviews for each word to edit
     @subViews = []
     @div id: 'content', =>
@@ -356,11 +356,11 @@ class AddWordsForm extends View
           attr.word = @form('get field', 'word').val()
           attr.definition = @form('get field', 'definition').val()
           word = new Word(attr)
-            .save {},
-              success: (model) =>
-                @form('get field', 'word').val ''
-                @form('get field', 'definition').val ''
-                @find('#word-input').focus()
+          word.save success: (model) =>
+            console.log 'do it'
+            @form('get field', 'word').val ''
+            @form('get field', 'definition').val ''
+            @find('#word-input').focus()
         else
           Messenger().post
             message: 'Please choose a type'

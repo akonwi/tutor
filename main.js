@@ -2,42 +2,47 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 $(document).ready(function() {
-  var Tutor;
+  var App;
   Messenger.options = {
     extraClasses: 'messenger-fixed messenger-on-top',
     theme: 'ice'
   };
-  Tutor = (function(_super) {
-    __extends(Tutor, _super);
+  App = (function(_super) {
+    __extends(App, _super);
 
-    function Tutor() {
-      return Tutor.__super__.constructor.apply(this, arguments);
+    function App() {
+      return App.__super__.constructor.apply(this, arguments);
     }
 
-    Tutor.prototype.initialize = function() {
+    App.prototype.initialize = function() {
       this.addRegions({
         container: '#container',
         sidebar: '#side-menu'
       });
       this.set('db', new Store);
       this.get('db').all((function(_this) {
-        return function(words) {
-          return _this.set('words', new Words(words));
+        return function(items) {
+          var collection;
+          collection = new Words(items);
+          _this.set('words', collection);
+          return collection.on('change', function(newCollection) {
+            return _this.set('words', newCollection);
+          });
         };
       })(this));
       return this.regions.sidebar.sidebar().toggle();
     };
 
-    Tutor.prototype.home = function() {
+    App.prototype.home = function() {
       this.regions.sidebar.hide();
       return this.render(new Views.home);
     };
 
-    Tutor.prototype.addWords = function() {
+    App.prototype.addWords = function() {
       return this.render(new Views.addWords);
     };
 
-    Tutor.prototype.studyWords = function(words) {
+    App.prototype.studyWords = function(words) {
       if (words != null) {
         return this.render(new Views.study({
           collection: words
@@ -47,14 +52,12 @@ $(document).ready(function() {
       }
     };
 
-    Tutor.prototype.edit = function() {
+    App.prototype.edit = function() {
       return this.get('db').all((function(_this) {
         return function(words) {
           if (words.length !== 0) {
             words = new Words(words);
-            return _this.render(new Views.editWords({
-              collection: words
-            }));
+            return _this.render(new Views.editWords(words));
           } else {
             return Messenger().post({
               message: "There are no words to edit",
@@ -65,7 +68,7 @@ $(document).ready(function() {
       })(this));
     };
 
-    Tutor.prototype.menu = function(view) {
+    App.prototype.menu = function(view) {
       if (view == null) {
         view = null;
       }
@@ -77,8 +80,8 @@ $(document).ready(function() {
       }
     };
 
-    return Tutor;
+    return App;
 
   })(Cosmo.Router);
-  return window.Tutor = new Tutor().start();
+  return window.Tutor = new App().start();
 });

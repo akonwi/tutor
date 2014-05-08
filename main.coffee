@@ -3,14 +3,18 @@ $(document).ready ->
     extraClasses: 'messenger-fixed messenger-on-top'
     theme: 'ice'
 
-  class Tutor extends Cosmo.Router
+  class App extends Cosmo.Router
     initialize: ->
       @addRegions
         container: '#container'
         sidebar: '#side-menu'
       @set 'db', new Store
-      @get('db').all (words) =>
-        @set 'words', new Words(words)
+      @get('db').all (items) =>
+        collection = new Words(items)
+        @set 'words', collection
+        # when collection changes(add/remove) update it
+        collection.on 'change', (newCollection) =>
+          @set 'words', newCollection
 
       # setup semantic sidebar
       @regions.sidebar.sidebar().toggle()
@@ -31,7 +35,7 @@ $(document).ready ->
       @get('db').all (words) =>
         if words.length isnt 0
           words = new Words(words)
-          @render new Views.editWords(collection: words)
+          @render new Views.editWords(words)
         else
           Messenger().post
             message: "There are no words to edit"
@@ -45,4 +49,4 @@ $(document).ready ->
         @regions.sidebar.html view
         @regions.sidebar.show()
 
-  window.Tutor = new Tutor().start()
+  window.Tutor = new App().start()
