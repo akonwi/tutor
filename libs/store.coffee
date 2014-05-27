@@ -36,7 +36,7 @@ window.Store = class Store
     storage.get null, (items) ->
       func.call this, toArray(items)
 
-  # follows chrome api but callback is given error and 'this' store object
+  # follows chrome api but callback is given error
   remove: (key, func) ->
     storage.remove key, ->
       if func?

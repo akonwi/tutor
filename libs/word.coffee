@@ -109,7 +109,8 @@ window.Word = class Word
 
   toJSON: -> clone(@attributes)
 
-  save: ({success, error}) ->
+  save: (attrs=null, {success, error}={}) ->
+    @set attrs if attrs?
     Tutor.get('db').set @toJSON(), (err) =>
       if error
         error?.call this, this

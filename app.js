@@ -1058,7 +1058,7 @@ EditWord = (function(_super) {
         rules: [
           {
             type: 'empty',
-            prompt: 'Need a definition'
+            prompt: "Can't be empty"
           }
         ]
       }
@@ -1069,8 +1069,6 @@ EditWord = (function(_super) {
     }).form('setting', {
       onSuccess: (function(_this) {
         return function() {
-          var new_def;
-          new_def = _this.form('get field', 'definition').val();
           return _this.word.save({
             definition: new_def
           });
@@ -1355,7 +1353,7 @@ AddWordsForm = (function(_super) {
             attr.word = _this.form('get field', 'word').val();
             attr.definition = _this.form('get field', 'definition').val();
             word = new Word(attr);
-            return word.save({
+            return word.save({}, {
               success: function(model) {
                 console.log('do it');
                 _this.form('get field', 'word').val('');
@@ -1642,9 +1640,15 @@ window.Word = Word = (function() {
     return clone(this.attributes);
   };
 
-  Word.prototype.save = function(_arg) {
-    var error, success;
-    success = _arg.success, error = _arg.error;
+  Word.prototype.save = function(attrs, _arg) {
+    var error, success, _ref;
+    if (attrs == null) {
+      attrs = null;
+    }
+    _ref = _arg != null ? _arg : {}, success = _ref.success, error = _ref.error;
+    if (attrs != null) {
+      this.set(attrs);
+    }
     return Tutor.get('db').set(this.toJSON(), (function(_this) {
       return function(err) {
         if (error) {

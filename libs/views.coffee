@@ -221,14 +221,13 @@ class EditWord extends View
         rules: [
           {
             type: 'empty'
-            prompt: 'Need a definition'
+            prompt: "Can't be empty"
           }
         ]
 
     @form rules, inline: true, on: 'submit'
     .form 'setting',
       onSuccess: =>
-        new_def = @form('get field', 'definition').val()
         @word.save definition: new_def
 
   delete: ->
@@ -356,7 +355,7 @@ class AddWordsForm extends View
           attr.word = @form('get field', 'word').val()
           attr.definition = @form('get field', 'definition').val()
           word = new Word(attr)
-          word.save success: (model) =>
+          word.save {}, success: (model) =>
             console.log 'do it'
             @form('get field', 'word').val ''
             @form('get field', 'definition').val ''
