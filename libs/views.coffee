@@ -94,6 +94,7 @@ window.Views =
                 type: ''
               @go 'home'
             else
+              console.log collection
               @go 'studyWords', collection.shuffle()
         onFailure: ->
           Messenger().post
@@ -119,9 +120,8 @@ window.Views =
           @div class: 'column'
 
     initialize: (@params) ->
-      @incorrect = 0
       @collection = @params.collection
-      @model = @collection.shift()?.clone()
+      @model = @collection.shift().clone()
       @initialize_form()
       @wordTitle.changeTo @capitalize(@model.get('word'))
       @model.on 'change', (model) =>
@@ -146,20 +146,11 @@ window.Views =
       $form = @find('.ui.form').form(rules, inline: true, on: 'submit')
       .form 'setting',
         onSuccess: =>
-          @incorrect = 0
           @showNext()
         onFailure: =>
-          if @incorrect is 2
-            @incorrect = 0
-            Messenger().post
-              message: "The answer is #{definition}"
-              type: ''
-            @showNext()
-          else
-            @incorrect++
+          console.log "The answer is #{definition}"
 
     showNext: ->
-      @incorrect = 0
       if next_word = @collection.shift()
         @model.set(next_word.attributes)
         @find('input').val ''

@@ -176,8 +176,9 @@ window.Words = class Words
 
   shift: ->
     length = @collection.length - 1
-    @collection.shift()
+    shifted = @collection.shift()
     @trigger 'change'
+    return shifted
 
   shuffle: ->
     toShuffle = []

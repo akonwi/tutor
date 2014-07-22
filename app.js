@@ -766,6 +766,7 @@ window.Views = {
                 });
                 return _this.go('home');
               } else {
+                console.log(collection);
                 return _this.go('studyWords', collection.shuffle());
               }
             });
@@ -840,11 +841,9 @@ window.Views = {
     };
 
     StudyView.prototype.initialize = function(params) {
-      var _ref;
       this.params = params;
-      this.incorrect = 0;
       this.collection = this.params.collection;
-      this.model = (_ref = this.collection.shift()) != null ? _ref.clone() : void 0;
+      this.model = this.collection.shift().clone();
       this.initialize_form();
       this.wordTitle.changeTo(this.capitalize(this.model.get('word')));
       return this.model.on('change', (function(_this) {
@@ -878,22 +877,12 @@ window.Views = {
       }).form('setting', {
         onSuccess: (function(_this) {
           return function() {
-            _this.incorrect = 0;
             return _this.showNext();
           };
         })(this),
         onFailure: (function(_this) {
           return function() {
-            if (_this.incorrect === 2) {
-              _this.incorrect = 0;
-              Messenger().post({
-                message: "The answer is " + definition,
-                type: ''
-              });
-              return _this.showNext();
-            } else {
-              return _this.incorrect++;
-            }
+            return console.log("The answer is " + definition);
           };
         })(this)
       });
@@ -901,7 +890,6 @@ window.Views = {
 
     StudyView.prototype.showNext = function() {
       var next_word;
-      this.incorrect = 0;
       if (next_word = this.collection.shift()) {
         this.model.set(next_word.attributes);
         return this.find('input').val('');
@@ -1766,10 +1754,11 @@ window.Words = Words = (function() {
   };
 
   Words.prototype.shift = function() {
-    var length;
+    var length, shifted;
     length = this.collection.length - 1;
-    this.collection.shift();
-    return this.trigger('change');
+    shifted = this.collection.shift();
+    this.trigger('change');
+    return shifted;
   };
 
   Words.prototype.shuffle = function() {
