@@ -38,9 +38,28 @@ body
   display: block
   li
     @extend .text-center
-    margin: 10px
+    +rem(margin, 10)
+
+.error
+  border-color: red
+  color: red
+  &:focus
+    outline: none !important
+    border: 1rem solid red
+    border: 10px solid red
+    box-shadow: 0 0 1rem red
+    box-shadow: 0 0 10px red
 
 #container
   width: 60%
   display: block
   margin: 0 auto 0 auto
+
+#stacked
+  width: 30%
+  display: block
+  margin: 0 auto 0 auto
+  input:not(#save), select
+    width: 80%
+    display: block
+    margin: 5px auto 5px auto

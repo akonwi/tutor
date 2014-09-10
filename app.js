@@ -543,7 +543,7 @@ window.Store = Store = (function() {
 
 })();
 
-var AddWordsForm, AddWordsMenu, AddWordsView, Btn, ChooseWordsView, EditWord, EditWords, EditWordsMenu, StudyMenu, StudyView, TypeDropdown, WordSection, WordTitle, foobar,
+var AddWordsForm, AddWordsMenu, AddWordsView, ChooseWordsView, EditWord, EditWords, EditWordsMenu, StudyMenu, StudyView, TypeDropdown, UrlBtn, WordSection, WordTitle, foobar,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -575,7 +575,7 @@ View.prototype.menu = function(view) {
 
 window.Views = {};
 
-Btn = React.createClass({
+UrlBtn = React.createClass({
   onClick: function(e) {
     return Tutor.go(this.props.url);
   },
@@ -596,13 +596,13 @@ Views.Home = React.createClass({
       className: 'text-center'
     }, h1('Tutor'), h2("Let's Study!")), div({}, ul({
       className: 'unstyled'
-    }, li(Btn({
+    }, li(UrlBtn({
       url: 'preStudy',
       text: 'Study'
-    })), li(Btn({
+    })), li(UrlBtn({
       url: 'addWords',
       text: 'Add words'
-    })), li(Btn({
+    })), li(UrlBtn({
       url: 'editWords',
       text: 'Edit words'
     })))));
@@ -617,19 +617,94 @@ Views.PreStudy = React.createClass({
       className: 'text-center'
     }, h2('Study'), h3('Study by type'), ul({
       className: 'unstyled'
-    }, li(Btn({
+    }, li(UrlBtn({
       url: 'study/all',
       text: 'All'
-    })), li(Btn({
-      url: 'study/verbs',
+    })), li(UrlBtn({
+      url: 'study/verb',
       text: 'Verbs'
-    })), li(Btn({
-      url: 'study/adjectives',
+    })), li(UrlBtn({
+      url: 'study/noun',
+      text: 'Nouns'
+    })), li(UrlBtn({
+      url: 'study/adjective',
       text: 'Adjectives'
-    })), li(Btn({
+    })), li(UrlBtn({
       url: 'study/stuff',
       text: 'Stuff'
     }))));
+  }
+});
+
+Views.AddWords = React.createClass({
+  componentDidMount: function() {
+    return this.refs.word.getDOMNode().focus();
+  },
+  validate: function(e) {
+    var attrs, definitionInput, valid, word, wordInput;
+    e.preventDefault();
+    valid = true;
+    wordInput = this.refs.word.getDOMNode();
+    if (wordInput.value.trim() === '') {
+      wordInput.classList.add('error');
+      valid = false;
+    } else {
+      wordInput.classList.remove('error');
+    }
+    definitionInput = this.refs.definition.getDOMNode();
+    if (definitionInput.value.trim() === '') {
+      definitionInput.classList.add('error');
+      valid = false;
+    } else {
+      definitionInput.classList.remove('error');
+    }
+    if (valid) {
+      attrs = {
+        id: wordInput.value,
+        definition: definitionInput.value,
+        type: this.refs.types.getDOMNode().value
+      };
+      word = new Word(attrs);
+      return word.save({}, {
+        success: function(saved) {
+          wordInput.value = '';
+          wordInput.focus();
+          return definitionInput.value = '';
+        }
+      });
+    }
+  },
+  render: function() {
+    var button, div, form, h2, input, option, select;
+    div = _.div, h2 = _.h2, select = _.select, option = _.option, form = _.form, input = _.input, button = _.button;
+    return div({
+      className: 'text-center'
+    }, h2('Add Words'), form({
+      id: 'stacked'
+    }, select({
+      ref: 'types'
+    }, option({
+      value: 'verb'
+    }, 'Verb'), option({
+      value: 'adjective'
+    }, 'Adjective'), option({
+      value: 'noun'
+    }, 'Noun'), option({
+      value: 'stuff'
+    }, 'Stuf')), input({
+      id: 'word',
+      ref: 'word',
+      type: 'text',
+      placeholder: 'Word'
+    }), input({
+      id: 'definition',
+      ref: 'definition',
+      type: 'text',
+      placeholder: 'Definition'
+    }), button({
+      id: 'save',
+      onClick: this.validate
+    }, 'Save')));
   }
 });
 

@@ -39,7 +39,7 @@ $(document).ready(function() {
     };
 
     App.prototype.addWords = function() {
-      return this.render(new Views.addWords);
+      return this.render(new Views.AddWords);
     };
 
     App.prototype.preStudy = function() {

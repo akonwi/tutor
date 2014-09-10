@@ -20,7 +20,7 @@ $(document).ready ->
 
     home: -> @render new Views.Home
 
-    addWords: -> @render new Views.addWords
+    addWords: -> @render new Views.AddWords
 
     preStudy: -> @render new Views.PreStudy
 

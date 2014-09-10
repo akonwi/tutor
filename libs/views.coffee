@@ -17,7 +17,7 @@ window.Views = {}
 ## Btn component
 # @props url
 # @props text to display
-Btn = React.createClass
+UrlBtn = React.createClass
   onClick: (e) -> Tutor.go @props.url
   render: ->
     {button} = _
@@ -32,9 +32,9 @@ Views.Home = React.createClass
         h2 "Let's Study!"
       div {},
         ul className: 'unstyled',
-          li(Btn url: 'preStudy', text: 'Study')
-          li(Btn url: 'addWords', text: 'Add words')
-          li(Btn url: 'editWords', text: 'Edit words')
+          li(UrlBtn url: 'preStudy', text: 'Study')
+          li(UrlBtn url: 'addWords', text: 'Add words')
+          li(UrlBtn url: 'editWords', text: 'Edit words')
 
 Views.PreStudy = React.createClass
   render: ->
@@ -43,10 +43,56 @@ Views.PreStudy = React.createClass
       h2 'Study'
       h3 'Study by type'
       ul className: 'unstyled',
-        li(Btn url: 'study/all', text: 'All')
-        li(Btn url: 'study/verbs', text: 'Verbs')
-        li(Btn url: 'study/adjectives', text: 'Adjectives')
-        li(Btn url: 'study/stuff', text: 'Stuff')
+        li(UrlBtn url: 'study/all', text: 'All')
+        li(UrlBtn url: 'study/verb', text: 'Verbs')
+        li(UrlBtn url: 'study/noun', text: 'Nouns')
+        li(UrlBtn url: 'study/adjective', text: 'Adjectives')
+        li(UrlBtn url: 'study/stuff', text: 'Stuff')
+
+Views.AddWords = React.createClass
+  componentDidMount: -> @refs.word.getDOMNode().focus()
+  validate: (e) ->
+    e.preventDefault()
+    valid = true
+
+    wordInput = @refs.word.getDOMNode()
+    if wordInput.value.trim() is ''
+      wordInput.classList.add('error')
+      valid = false
+    else
+      wordInput.classList.remove('error')
+
+    definitionInput = @refs.definition.getDOMNode()
+    if definitionInput.value.trim() is ''
+      definitionInput.classList.add('error')
+      valid = false
+    else
+      definitionInput.classList.remove('error')
+
+    if valid
+      attrs =
+        id: wordInput.value
+        definition: definitionInput.value
+        type: @refs.types.getDOMNode().value
+      word = new Word(attrs)
+      word.save {}, success: (saved) ->
+        wordInput.value = ''
+        wordInput.focus()
+        definitionInput.value = ''
+
+  render: ->
+    {div, h2, select, option, form, input, button} = _
+    div className: 'text-center',
+      h2 'Add Words'
+      form id: 'stacked',
+        select ref: 'types',
+          option value: 'verb', 'Verb'
+          option value: 'adjective', 'Adjective'
+          option value: 'noun', 'Noun'
+          option value: 'stuff', 'Stuf'
+        input id: 'word', ref: 'word', type: 'text', placeholder: 'Word'
+        input id: 'definition', ref: 'definition', type: 'text', placeholder: 'Definition'
+        button id: 'save', onClick: @validate, 'Save'
 
 foobar =
   addWords: class AddWordsView extends View
