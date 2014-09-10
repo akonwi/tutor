@@ -87,23 +87,31 @@ Cosmo.Events =
     obj.once name, callback, context
 
 window.Word = class Word
-  toAttributes:
-    id: -> @get('word')
+  constructor: (@attributes={ id: null }) -> extend(this, Cosmo.Events)
 
-  constructor: (@attributes={}) -> extend(this, Cosmo.Events)
-
+  # Set attributes, but 'id' can't be overridden if it exists
   set: (attr, val) ->
+    changed = false
     if typeof attr is 'object'
       for key, val of attr
-        @attributes[key] = val
-        @trigger "change #{key}"
+        if (key is 'id' and not @attributes.id?) or key is not 'id'
+          @attributes[key] = val
+          @trigger "change #{key}"
+          changed = true
     else
       @attributes[attr] = val
       @trigger "change #{attr}"
-    @trigger 'change'
-    undefined
+      changed = true
+    if changed?
+      @trigger 'change'
+      return true
+    else
+      return false
 
-  get: (attr) -> @attributes[attr] or @toAttributes[attr].call(this)
+  get: (attr) -> @attributes[attr]
+
+  # complete overwrite of @attributes
+  flush: (@attributes) ->
 
   clone: -> new @constructor(clone(@attributes))
 
@@ -155,7 +163,7 @@ window.Words = class Words
             match = false
             break
         results.push word if match
-      results
+      new Words(results)
 
   findWhere: (query={}) ->
     @where(query)[0]

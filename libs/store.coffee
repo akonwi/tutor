@@ -12,7 +12,7 @@ window.Store = class Store
   # given a pure json object, it will be saved with it's 'id' as the key
   # callback is given error if it exists
   set: (obj, func) ->
-    (toSave = {})[obj.word] = obj
+    (toSave = {})[obj.id] = obj
     console.log "to save", toSave
     storage.set toSave, =>
       if func?

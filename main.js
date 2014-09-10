@@ -14,13 +14,11 @@ $(document).ready(function() {
       return App.__super__.constructor.apply(this, arguments);
     }
 
+    App.prototype.container = document.getElementById('container');
+
     App.prototype.initialize = function() {
-      this.addRegions({
-        container: '#container',
-        sidebar: '#side-menu'
-      });
       this.set('db', new Store);
-      this.get('db').all((function(_this) {
+      return this.get('db').all((function(_this) {
         return function(items) {
           var collection;
           collection = new Words(items);
@@ -30,26 +28,39 @@ $(document).ready(function() {
           });
         };
       })(this));
-      return this.regions.sidebar.sidebar().toggle();
+    };
+
+    App.prototype.render = function(component) {
+      return React.renderComponent(component, this.container);
     };
 
     App.prototype.home = function() {
-      this.regions.sidebar.hide();
-      return this.render(new Views.home);
+      return this.render(new Views.Home);
     };
 
     App.prototype.addWords = function() {
       return this.render(new Views.addWords);
     };
 
-    App.prototype.studyWords = function(words) {
-      if (words != null) {
-        return this.render(new Views.study({
-          collection: words
-        }));
-      } else {
-        return this.render(new Views.preStudy);
-      }
+    App.prototype.preStudy = function() {
+      return this.render(new Views.PreStudy);
+    };
+
+    App.prototype.study = function(type) {
+      var collection;
+      return collection = this.get('db').all((function(_this) {
+        return function(words) {
+          words = new Words(words);
+          if (type === 'all') {
+
+          } else {
+            words = words.where({
+              type: type
+            });
+          }
+          return console.log(words);
+        };
+      })(this));
     };
 
     App.prototype.edit = function() {
@@ -71,12 +82,6 @@ $(document).ready(function() {
     App.prototype.menu = function(view) {
       if (view == null) {
         view = null;
-      }
-      if (view === null) {
-        return this.regions.sidebar.hide();
-      } else {
-        this.regions.sidebar.html(view);
-        return this.regions.sidebar.show();
       }
     };
 

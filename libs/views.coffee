@@ -12,33 +12,43 @@ View::capitalize = (word) ->
 
 View::menu = (view) -> Tutor.menu(view)
 
-window.Views =
-  home: class HomeView extends View
-    @content: ->
-      @div id: 'content', =>
-        @div class: 'ui huge center aligned header', 'Tutor'
-        @div class: 'ui large center aligned header', "Let's Study!"
-        @div class: 'ui center aligned three column grid', =>
-          @div class: 'row', =>
-            @div id: 'study-button',
-              class: 'ui button',
-              click: 'study',
-              'Study'
-          @div class: 'row', =>
-            @div id: 'add-words-button',
-              class: 'ui button',
-              click: 'add'
-              'Add words'
-          @div class: 'row', =>
-            @div id: 'edit-words-button',
-              class: 'ui button',
-              click: 'edit',
-              'Edit Words'
+window.Views = {}
 
-    study: -> @go 'studyWords'
-    add: -> @go 'addWords'
-    edit: -> @go 'edit'
+## Btn component
+# @props url
+# @props text to display
+Btn = React.createClass
+  onClick: (e) -> Tutor.go @props.url
+  render: ->
+    {button} = _
+    button onClick: @onClick, @props.text
 
+Views.Home = React.createClass
+  render: ->
+    {div, h1, h2, li, ul} = _
+    div {},
+      div className: 'text-center',
+        h1 'Tutor'
+        h2 "Let's Study!"
+      div {},
+        ul className: 'unstyled',
+          li(Btn url: 'preStudy', text: 'Study')
+          li(Btn url: 'addWords', text: 'Add words')
+          li(Btn url: 'editWords', text: 'Edit words')
+
+Views.PreStudy = React.createClass
+  render: ->
+    {div, h2, h3, ul, li} = _
+    div className: 'text-center',
+      h2 'Study'
+      h3 'Study by type'
+      ul className: 'unstyled',
+        li(Btn url: 'study/all', text: 'All')
+        li(Btn url: 'study/verbs', text: 'Verbs')
+        li(Btn url: 'study/adjectives', text: 'Adjectives')
+        li(Btn url: 'study/stuff', text: 'Stuff')
+
+foobar =
   addWords: class AddWordsView extends View
     @content: ->
       @div id: 'content', =>
@@ -119,13 +129,12 @@ window.Views =
               @div class: 'ui green submit button', 'Check'
           @div class: 'column'
 
-    initialize: (@params) ->
-      @collection = @params.collection
+    initialize: ({@collection}) ->
       @model = @collection.shift().clone()
       @initialize_form()
-      @wordTitle.changeTo @capitalize(@model.get('word'))
+      @wordTitle.changeTo @capitalize(@model.get('id'))
       @model.on 'change', (model) =>
-        @wordTitle.changeTo @capitalize(model.get('word'))
+        @wordTitle.changeTo @capitalize(model.get('id'))
         @initialize_form()
 
     initialize_form: ->
@@ -152,7 +161,7 @@ window.Views =
 
     showNext: ->
       if next_word = @collection.shift()
-        @model.set(next_word.attributes)
+        @model.flush(next_word.attributes)
         @find('input').val ''
       else
         Messenger().post
@@ -186,7 +195,7 @@ class WordSection extends View
     # filter which words are shown based on user input
     @on 'filterChange', (e, query) =>
       for view in @constructor.subViews
-        if ~view.word.get('word').indexOf query
+        if ~view.word.get('id').indexOf query
           view.show()
         else
           view.hide()
@@ -194,7 +203,7 @@ class WordSection extends View
 class EditWord extends View
   @content: (@word) ->
     @div class: 'ui form segment', =>
-      @div class: 'ui huge center header', @word.get('word')
+      @div class: 'ui huge center header', @word.get('id')
       @div class: 'field', =>
         @div class: 'ui input', =>
           @input id: 'definition-input',
@@ -331,7 +340,7 @@ class AddWordsForm extends View
       not (value.length is 0)
 
     $.fn.form.settings.rules.exists = (value) ->
-      not Tutor.get('words').findWhere(word: value)
+      not Tutor.get('words').findWhere(id: value)
 
     $dropdown = @find('.ui.selection.dropdown').dropdown()
     # this is the form so call `this.form`
@@ -343,7 +352,7 @@ class AddWordsForm extends View
         attr = {}
         attr.type = $dropdown.dropdown('get value')
         if @isString attr.type
-          attr.word = @form('get field', 'word').val()
+          attr.id = @form('get field', 'word').val()
           attr.definition = @form('get field', 'definition').val()
           word = new Word(attr)
           word.save {}, success: (model) =>

@@ -402,8 +402,6 @@ exports.$$$ = function(fn) {
   return View.buildHtml.call(View, fn)[0];
 };
 
-var __slice = [].slice;
-
 window.Cosmo = {
   version: '0.1.0'
 };
@@ -411,24 +409,11 @@ window.Cosmo = {
 Cosmo.Router = (function() {
   function Router() {}
 
-  Router.prototype.regions = {
-    container: $('#container')
-  };
-
   Router.prototype.initialize = function() {};
 
   Router.prototype.start = function() {
     this.initialize();
     this.go('home');
-    return this;
-  };
-
-  Router.prototype.addRegions = function(regions) {
-    var key, value;
-    for (key in regions) {
-      value = regions[key];
-      this.regions[key] = $(value);
-    }
     return this;
   };
 
@@ -445,23 +430,46 @@ Cosmo.Router = (function() {
     return this[key];
   };
 
-  Router.prototype.go = function() {
-    var args, page;
-    page = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+  Router.prototype.go = function(route) {
+    var page, params, url;
+    url = route.split('/');
+    page = url.shift();
+    params = url;
     if (this[page] != null) {
-      return typeof this[page] === "function" ? this[page](args[0], args[1]) : void 0;
+      return typeof this[page] === "function" ? this[page](params[0], params[1]) : void 0;
     } else {
       return this.home();
     }
   };
 
-  Router.prototype.render = function(view) {
-    return this.regions.container.html(view);
-  };
-
   return Router;
 
 })();
+
+var DOM, tag, tagName, _fn,
+  __slice = [].slice;
+
+DOM = React.DOM;
+
+tag = function() {
+  var args, attributes, name, _ref;
+  name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+  if (((_ref = args[0]) != null ? _ref.constructor : void 0) === Object) {
+    attributes = args.shift();
+  } else {
+    attributes = {};
+  }
+  return DOM[name].apply(DOM, [attributes].concat(__slice.call(args)));
+};
+
+window._ = {};
+
+_fn = function(tagName) {
+  return window._[tagName] = tag.bind(this, tagName);
+};
+for (tagName in DOM) {
+  _fn(tagName);
+}
 
 var Store, runtime, storage, toArray;
 
@@ -484,7 +492,7 @@ window.Store = Store = (function() {
 
   Store.prototype.set = function(obj, func) {
     var toSave;
-    (toSave = {})[obj.word] = obj;
+    (toSave = {})[obj.id] = obj;
     console.log("to save", toSave);
     return storage.set(toSave, (function(_this) {
       return function() {
@@ -535,7 +543,7 @@ window.Store = Store = (function() {
 
 })();
 
-var AddWordsForm, AddWordsMenu, AddWordsView, ChooseWordsView, EditWord, EditWords, EditWordsMenu, HomeView, StudyMenu, StudyView, TypeDropdown, WordSection, WordTitle,
+var AddWordsForm, AddWordsMenu, AddWordsView, Btn, ChooseWordsView, EditWord, EditWords, EditWordsMenu, StudyMenu, StudyView, TypeDropdown, WordSection, WordTitle, foobar,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -565,78 +573,67 @@ View.prototype.menu = function(view) {
   return Tutor.menu(view);
 };
 
-window.Views = {
-  home: HomeView = (function(_super) {
-    __extends(HomeView, _super);
+window.Views = {};
 
-    function HomeView() {
-      return HomeView.__super__.constructor.apply(this, arguments);
-    }
+Btn = React.createClass({
+  onClick: function(e) {
+    return Tutor.go(this.props.url);
+  },
+  render: function() {
+    var button;
+    button = _.button;
+    return button({
+      onClick: this.onClick
+    }, this.props.text);
+  }
+});
 
-    HomeView.content = function() {
-      return this.div({
-        id: 'content'
-      }, (function(_this) {
-        return function() {
-          _this.div({
-            "class": 'ui huge center aligned header'
-          }, 'Tutor');
-          _this.div({
-            "class": 'ui large center aligned header'
-          }, "Let's Study!");
-          return _this.div({
-            "class": 'ui center aligned three column grid'
-          }, function() {
-            _this.div({
-              "class": 'row'
-            }, function() {
-              return _this.div({
-                id: 'study-button'
-              }, {
-                "class": 'ui button',
-                click: 'study'
-              }, 'Study');
-            });
-            _this.div({
-              "class": 'row'
-            }, function() {
-              return _this.div({
-                id: 'add-words-button'
-              }, {
-                "class": 'ui button',
-                click: 'add'
-              }, 'Add words');
-            });
-            return _this.div({
-              "class": 'row'
-            }, function() {
-              return _this.div({
-                id: 'edit-words-button'
-              }, {
-                "class": 'ui button',
-                click: 'edit'
-              }, 'Edit Words');
-            });
-          });
-        };
-      })(this));
-    };
+Views.Home = React.createClass({
+  render: function() {
+    var div, h1, h2, li, ul;
+    div = _.div, h1 = _.h1, h2 = _.h2, li = _.li, ul = _.ul;
+    return div({}, div({
+      className: 'text-center'
+    }, h1('Tutor'), h2("Let's Study!")), div({}, ul({
+      className: 'unstyled'
+    }, li(Btn({
+      url: 'preStudy',
+      text: 'Study'
+    })), li(Btn({
+      url: 'addWords',
+      text: 'Add words'
+    })), li(Btn({
+      url: 'editWords',
+      text: 'Edit words'
+    })))));
+  }
+});
 
-    HomeView.prototype.study = function() {
-      return this.go('studyWords');
-    };
+Views.PreStudy = React.createClass({
+  render: function() {
+    var div, h2, h3, li, ul;
+    div = _.div, h2 = _.h2, h3 = _.h3, ul = _.ul, li = _.li;
+    return div({
+      className: 'text-center'
+    }, h2('Study'), h3('Study by type'), ul({
+      className: 'unstyled'
+    }, li(Btn({
+      url: 'study/all',
+      text: 'All'
+    })), li(Btn({
+      url: 'study/verbs',
+      text: 'Verbs'
+    })), li(Btn({
+      url: 'study/adjectives',
+      text: 'Adjectives'
+    })), li(Btn({
+      url: 'study/stuff',
+      text: 'Stuff'
+    }))));
+  }
+});
 
-    HomeView.prototype.add = function() {
-      return this.go('addWords');
-    };
-
-    HomeView.prototype.edit = function() {
-      return this.go('edit');
-    };
-
-    return HomeView;
-
-  })(View),
+foobar = {
   addWords: AddWordsView = (function(_super) {
     __extends(AddWordsView, _super);
 
@@ -840,15 +837,14 @@ window.Views = {
       })(this));
     };
 
-    StudyView.prototype.initialize = function(params) {
-      this.params = params;
-      this.collection = this.params.collection;
+    StudyView.prototype.initialize = function(_arg) {
+      this.collection = _arg.collection;
       this.model = this.collection.shift().clone();
       this.initialize_form();
-      this.wordTitle.changeTo(this.capitalize(this.model.get('word')));
+      this.wordTitle.changeTo(this.capitalize(this.model.get('id')));
       return this.model.on('change', (function(_this) {
         return function(model) {
-          _this.wordTitle.changeTo(_this.capitalize(model.get('word')));
+          _this.wordTitle.changeTo(_this.capitalize(model.get('id')));
           return _this.initialize_form();
         };
       })(this));
@@ -891,7 +887,7 @@ window.Views = {
     StudyView.prototype.showNext = function() {
       var next_word;
       if (next_word = this.collection.shift()) {
-        this.model.set(next_word.attributes);
+        this.model.flush(next_word.attributes);
         return this.find('input').val('');
       } else {
         Messenger().post({
@@ -979,7 +975,7 @@ WordSection = (function(_super) {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           view = _ref[_i];
-          if (~view.word.get('word').indexOf(query)) {
+          if (~view.word.get('id').indexOf(query)) {
             _results.push(view.show());
           } else {
             _results.push(view.hide());
@@ -1009,7 +1005,7 @@ EditWord = (function(_super) {
       return function() {
         _this.div({
           "class": 'ui huge center header'
-        }, _this.word.get('word'));
+        }, _this.word.get('id'));
         _this.div({
           "class": 'field'
         }, function() {
@@ -1324,7 +1320,7 @@ AddWordsForm = (function(_super) {
     };
     $.fn.form.settings.rules.exists = function(value) {
       return !Tutor.get('words').findWhere({
-        word: value
+        id: value
       });
     };
     $dropdown = this.find('.ui.selection.dropdown').dropdown();
@@ -1338,7 +1334,7 @@ AddWordsForm = (function(_super) {
           attr = {};
           attr.type = $dropdown.dropdown('get value');
           if (_this.isString(attr.type)) {
-            attr.word = _this.form('get field', 'word').val();
+            attr.id = _this.form('get field', 'word').val();
             attr.definition = _this.form('get field', 'definition').val();
             word = new Word(attr);
             return word.save({}, {
@@ -1589,35 +1585,44 @@ Cosmo.Events = {
 };
 
 window.Word = Word = (function() {
-  Word.prototype.toAttributes = {
-    id: function() {
-      return this.get('word');
-    }
-  };
-
   function Word(attributes) {
-    this.attributes = attributes != null ? attributes : {};
+    this.attributes = attributes != null ? attributes : {
+      id: null
+    };
     extend(this, Cosmo.Events);
   }
 
   Word.prototype.set = function(attr, val) {
-    var key;
+    var changed, key;
+    changed = false;
     if (typeof attr === 'object') {
       for (key in attr) {
         val = attr[key];
-        this.attributes[key] = val;
-        this.trigger("change " + key);
+        if ((key === 'id' && (this.attributes.id == null)) || key === !'id') {
+          this.attributes[key] = val;
+          this.trigger("change " + key);
+          changed = true;
+        }
       }
     } else {
       this.attributes[attr] = val;
       this.trigger("change " + attr);
+      changed = true;
     }
-    this.trigger('change');
-    return void 0;
+    if (changed != null) {
+      this.trigger('change');
+      return true;
+    } else {
+      return false;
+    }
   };
 
   Word.prototype.get = function(attr) {
-    return this.attributes[attr] || this.toAttributes[attr].call(this);
+    return this.attributes[attr];
+  };
+
+  Word.prototype.flush = function(attributes) {
+    this.attributes = attributes;
   };
 
   Word.prototype.clone = function() {
@@ -1720,7 +1725,7 @@ window.Words = Words = (function() {
           results.push(word);
         }
       }
-      return results;
+      return new Words(results);
     }
   };
 

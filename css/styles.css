@@ -1,22 +1,2 @@
-/*******************************
-            Global
-*******************************/
-
-html,
-body {
-  font-size: 15px;
-  height: 100%;
-}
-
-body {
-  font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-  background: #FFFFFF;
-  margin: 0px;
-  padding: 0px;
-  color: #555555;
-  text-rendering: optimizeLegibility;
-  min-width: 320px;
-  overflow-y: scroll;
-}
-
-.segment.edit-word { margin-bottom: 10px !important; }
+html{font-size:62.5%}body{font-family:"Open Sans","Helvetica Neue","Helvetica","Arial",sans-serif;background:#fff;margin:0px;padding:0px;color:#555;line-height:1.5;font-size:16px;font-size:1.6rem;text-rendering:optimizeLegibility;min-width:320px;overflow-y:scroll}.text-center,.unstyled li{text-align:center}.unstyled{list-style-type:none;padding:0;display:block}.unstyled li{margin:10px}#container{width:60%;display:block;margin:0 auto 0 auto}
+/*# sourceMappingURL=styles.css.map */

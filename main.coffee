@@ -4,10 +4,9 @@ $(document).ready ->
     theme: 'ice'
 
   class App extends Cosmo.Router
+    container: document.getElementById('container')
+
     initialize: ->
-      @addRegions
-        container: '#container'
-        sidebar: '#side-menu'
       @set 'db', new Store
       @get('db').all (items) =>
         collection = new Words(items)
@@ -16,20 +15,24 @@ $(document).ready ->
         collection.on 'change', (newCollection) =>
           @set 'words', newCollection
 
-      # setup semantic sidebar
-      @regions.sidebar.sidebar().toggle()
+    render: (component) ->
+      React.renderComponent(component, @container)
 
-    home: ->
-      @regions.sidebar.hide()
-      @render new Views.home
+    home: -> @render new Views.Home
 
     addWords: -> @render new Views.addWords
 
-    studyWords: (words) ->
-      if words?
-        @render new Views.study(collection: words)
-      else
-        @render new Views.preStudy
+    preStudy: -> @render new Views.PreStudy
+
+    study: (type) ->
+      collection = @get('db').all (words) =>
+        words = new Words(words)
+        if type is 'all'
+          # @render...
+        else
+          words = words.where type: type
+          # @render...
+        console.log words
 
     edit: ->
       @get('db').all (words) =>
@@ -43,10 +46,10 @@ $(document).ready ->
 
     # if no view, hide the sidebar
     menu: (view=null) ->
-      if view is null
-        @regions.sidebar.hide()
-      else
-        @regions.sidebar.html view
-        @regions.sidebar.show()
+      #if view is null
+        #@regions.sidebar.hide()
+      #else
+        #@regions.sidebar.html view
+        #@regions.sidebar.show()
 
   window.Tutor = new App().start()
