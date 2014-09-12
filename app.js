@@ -402,50 +402,6 @@ exports.$$$ = function(fn) {
   return View.buildHtml.call(View, fn)[0];
 };
 
-window.Cosmo = {
-  version: '0.1.0'
-};
-
-Cosmo.Router = (function() {
-  function Router() {}
-
-  Router.prototype.initialize = function() {};
-
-  Router.prototype.start = function() {
-    this.initialize();
-    this.go('home');
-    return this;
-  };
-
-  Router.prototype.set = function(key, val) {
-    if (val != null) {
-      this[key] = val;
-    } else {
-      this[key] = null;
-    }
-    return this;
-  };
-
-  Router.prototype.get = function(key) {
-    return this[key];
-  };
-
-  Router.prototype.go = function(route) {
-    var page, params, url;
-    url = route.split('/');
-    page = url.shift();
-    params = url;
-    if (this[page] != null) {
-      return typeof this[page] === "function" ? this[page](params[0], params[1]) : void 0;
-    } else {
-      return this.home();
-    }
-  };
-
-  return Router;
-
-})();
-
 var DOM, tag, tagName, _fn,
   __slice = [].slice;
 
@@ -470,6 +426,50 @@ _fn = function(tagName) {
 for (tagName in DOM) {
   _fn(tagName);
 }
+
+var Router;
+
+Router = (function() {
+  function Router() {}
+
+  Router.prototype._storage = {};
+
+  Router.prototype.initialize = function() {};
+
+  Router.prototype.start = function() {
+    this.initialize();
+    this.go('index');
+    return this;
+  };
+
+  Router.prototype.set = function(key, val) {
+    if (val != null) {
+      this._storage[key] = val;
+    } else {
+      this._storage[key] = null;
+    }
+    return this;
+  };
+
+  Router.prototype.get = function(key) {
+    return this._storage[key];
+  };
+
+  Router.prototype.go = function(url) {
+    var page, params, route;
+    route = url.split('/');
+    page = route.shift();
+    params = route;
+    if (this[page] != null) {
+      return typeof this[page] === "function" ? this[page](params[0], params[1]) : void 0;
+    } else {
+      return this.index();
+    }
+  };
+
+  return Router;
+
+})();
 
 var Store, runtime, storage, toArray;
 
@@ -543,41 +543,28 @@ window.Store = Store = (function() {
 
 })();
 
-var AddWordsForm, AddWordsMenu, AddWordsView, ChooseWordsView, EditWord, EditWords, EditWordsMenu, StudyMenu, StudyView, TypeDropdown, UrlBtn, WordSection, WordTitle, foobar,
-  __slice = [].slice,
+var EditWord, EditWords, EditWordsMenu, Navigation, StringTweaks, UrlBtn, WordSection, foobar,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-View.prototype.go = function() {
-  var args, page;
-  page = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-  switch (args.length) {
-    case 1:
-      return Tutor.go(page, args[0]);
-    case 2:
-      return Tutor.go(page, args[0], args[1]);
-    default:
-      return Tutor.go(page);
+Navigation = {
+  go: function(url) {
+    return Tutor.go(url);
   }
 };
 
-View.prototype.isString = function(obj) {
-  return toString.call(obj).indexOf('String') !== -1;
-};
-
-View.prototype.capitalize = function(word) {
-  return word[0].toUpperCase() + word.slice(1).toLowerCase();
-};
-
-View.prototype.menu = function(view) {
-  return Tutor.menu(view);
+StringTweaks = {
+  capitalize: function(word) {
+    return word[0].toUpperCase() + word.slice(1).toLowerCase();
+  }
 };
 
 window.Views = {};
 
 UrlBtn = React.createClass({
+  mixins: [Navigation],
   onClick: function(e) {
-    return Tutor.go(this.props.url);
+    return this.go(this.props.url);
   },
   render: function() {
     var button;
@@ -606,33 +593,6 @@ Views.Home = React.createClass({
       url: 'editWords',
       text: 'Edit words'
     })))));
-  }
-});
-
-Views.PreStudy = React.createClass({
-  render: function() {
-    var div, h2, h3, li, ul;
-    div = _.div, h2 = _.h2, h3 = _.h3, ul = _.ul, li = _.li;
-    return div({
-      className: 'text-center'
-    }, h2('Study'), h3('Study by type'), ul({
-      className: 'unstyled'
-    }, li(UrlBtn({
-      url: 'study/all',
-      text: 'All'
-    })), li(UrlBtn({
-      url: 'study/verb',
-      text: 'Verbs'
-    })), li(UrlBtn({
-      url: 'study/noun',
-      text: 'Nouns'
-    })), li(UrlBtn({
-      url: 'study/adjective',
-      text: 'Adjectives'
-    })), li(UrlBtn({
-      url: 'study/stuff',
-      text: 'Stuff'
-    }))));
   }
 });
 
@@ -675,8 +635,8 @@ Views.AddWords = React.createClass({
     }
   },
   render: function() {
-    var button, div, form, h2, input, option, select;
-    div = _.div, h2 = _.h2, select = _.select, option = _.option, form = _.form, input = _.input, button = _.button;
+    var div, form, h2, input, option, select;
+    div = _.div, h2 = _.h2, select = _.select, option = _.option, form = _.form, input = _.input;
     return div({
       className: 'text-center'
     }, h2('Add Words'), form({
@@ -691,7 +651,7 @@ Views.AddWords = React.createClass({
       value: 'noun'
     }, 'Noun'), option({
       value: 'stuff'
-    }, 'Stuf')), input({
+    }, 'Stuff')), input({
       id: 'word',
       ref: 'word',
       type: 'text',
@@ -701,281 +661,93 @@ Views.AddWords = React.createClass({
       ref: 'definition',
       type: 'text',
       placeholder: 'Definition'
-    }), button({
-      id: 'save',
-      onClick: this.validate
-    }, 'Save')));
+    }), input({
+      className: 'save',
+      type: 'submit',
+      onClick: this.validate,
+      value: 'Save'
+    })));
+  }
+});
+
+Views.PreStudy = React.createClass({
+  render: function() {
+    var div, h2, h3, li, ul;
+    div = _.div, h2 = _.h2, h3 = _.h3, ul = _.ul, li = _.li;
+    return div({
+      className: 'text-center'
+    }, h2('Study'), h3('Study by type'), ul({
+      className: 'unstyled'
+    }, li(UrlBtn({
+      url: 'study/all',
+      text: 'All'
+    })), li(UrlBtn({
+      url: 'study/verb',
+      text: 'Verbs'
+    })), li(UrlBtn({
+      url: 'study/noun',
+      text: 'Nouns'
+    })), li(UrlBtn({
+      url: 'study/adjective',
+      text: 'Adjectives'
+    })), li(UrlBtn({
+      url: 'study/stuff',
+      text: 'Stuff'
+    }))));
+  }
+});
+
+Views.Study = React.createClass({
+  mixins: [StringTweaks],
+  getInitialState: function() {
+    return {
+      word: this.props.collection.shift()
+    };
+  },
+  getInitialProps: function() {
+    return {
+      wrongCount: 0
+    };
+  },
+  validate: function(e) {
+    var defInput;
+    e.preventDefault();
+    defInput = this.refs.definition.getDOMNode();
+    if (defInput.value === this.state.word.get('definition')) {
+      defInput.classList.remove('error');
+      defInput.value = '';
+      if (this.props.collection.hasNext()) {
+        return this.setState({
+          word: this.props.collection.shift()
+        });
+      } else {
+        return this.go('index');
+      }
+    } else {
+      return defInput.classList.add('error');
+    }
+  },
+  render: function() {
+    var div, form, h2, h3, input;
+    div = _.div, h2 = _.h2, h3 = _.h3, form = _.form, input = _.input;
+    return div({
+      className: 'text-center'
+    }, h2('Study'), h3(this.capitalize(this.state.word.get('id'))), form({
+      id: 'stacked'
+    }, input({
+      id: 'definition',
+      ref: 'definition',
+      type: 'text'
+    }), input({
+      className: 'save',
+      type: 'submit',
+      onClick: this.validate,
+      value: 'Check'
+    })));
   }
 });
 
 foobar = {
-  addWords: AddWordsView = (function(_super) {
-    __extends(AddWordsView, _super);
-
-    function AddWordsView() {
-      return AddWordsView.__super__.constructor.apply(this, arguments);
-    }
-
-    AddWordsView.content = function() {
-      return this.div({
-        id: 'content'
-      }, (function(_this) {
-        return function() {
-          _this.div({
-            "class": 'ui huge center aligned header'
-          }, 'Add Words');
-          return _this.div({
-            "class": 'ui center aligned three column grid'
-          }, function() {
-            _this.div({
-              "class": 'column'
-            });
-            _this.div({
-              "class": 'column'
-            }, function() {
-              return _this.subview('addWordsForm', new AddWordsForm);
-            });
-            return _this.div({
-              "class": 'column'
-            });
-          });
-        };
-      })(this));
-    };
-
-    AddWordsView.prototype.initialize = function() {
-      return this.menu(new AddWordsMenu);
-    };
-
-    return AddWordsView;
-
-  })(View),
-  preStudy: ChooseWordsView = (function(_super) {
-    __extends(ChooseWordsView, _super);
-
-    function ChooseWordsView() {
-      return ChooseWordsView.__super__.constructor.apply(this, arguments);
-    }
-
-    ChooseWordsView.content = function() {
-      return this.div({
-        id: 'content'
-      }, (function(_this) {
-        return function() {
-          _this.div({
-            "class": 'ui huge center aligned header'
-          }, 'Study');
-          return _this.div({
-            "class": 'ui center aligned three column grid'
-          }, function() {
-            _this.div({
-              "class": 'column'
-            });
-            _this.div({
-              "class": 'column'
-            }, function() {
-              _this.div({
-                "class": 'ui teal medium center aligned header'
-              }, 'Study by type');
-              return _this.div({
-                "class": 'ui form segment'
-              }, function() {
-                _this.subview('typeDropdown', new TypeDropdown);
-                return _this.div({
-                  "class": 'ui green submit button'
-                }, 'Continue');
-              });
-            });
-            return _this.div({
-              "class": 'column'
-            });
-          });
-        };
-      })(this));
-    };
-
-    ChooseWordsView.prototype.initialize = function() {
-      var $dropdown, $form, rules;
-      this.menu(new StudyMenu);
-      this.typeDropdown.find('.menu').prepend($$(function() {
-        return this.div({
-          "class": 'item',
-          'data-value': 'all'
-        }, 'All');
-      }));
-      rules = {
-        type: {
-          identifier: 'type',
-          rules: [
-            {
-              type: 'empty',
-              prompt: 'Need a type'
-            }
-          ]
-        }
-      };
-      $dropdown = this.find('.ui.selection.dropdown').dropdown();
-      $form = this.find('.ui.form');
-      return $form.form(rules, {
-        on: 'submit'
-      }).form('setting', {
-        onSuccess: (function(_this) {
-          return function() {
-            var word_type;
-            word_type = $dropdown.dropdown('get value');
-            return Tutor.get('db').all(function(words) {
-              var collection;
-              collection = new Words(words);
-              if (word_type !== 'all') {
-                collection = new Words(collection.where({
-                  type: word_type
-                }));
-              }
-              if (collection.length === 0) {
-                Messenger().post({
-                  message: 'There are no words',
-                  type: ''
-                });
-                return _this.go('home');
-              } else {
-                console.log(collection);
-                return _this.go('studyWords', collection.shuffle());
-              }
-            });
-          };
-        })(this),
-        onFailure: function() {
-          return Messenger().post({
-            message: 'Please choose which type of words to study',
-            type: ''
-          });
-        }
-      });
-    };
-
-    return ChooseWordsView;
-
-  })(View),
-  study: StudyView = (function(_super) {
-    __extends(StudyView, _super);
-
-    function StudyView() {
-      return StudyView.__super__.constructor.apply(this, arguments);
-    }
-
-    StudyView.content = function() {
-      return this.div({
-        id: 'content'
-      }, (function(_this) {
-        return function() {
-          _this.div({
-            "class": 'ui huge center aligned header'
-          }, 'Study');
-          return _this.div({
-            "class": 'ui center aligned three column grid'
-          }, function() {
-            _this.div({
-              "class": 'column'
-            });
-            _this.div({
-              "class": 'column'
-            }, function() {
-              _this.subview('wordTitle', new WordTitle);
-              return _this.div({
-                "class": 'ui form segment'
-              }, function() {
-                _this.div({
-                  "class": 'field'
-                }, function() {
-                  return _this.div({
-                    "class": 'ui input'
-                  }, function() {
-                    return _this.input({
-                      id: 'definition-input'
-                    }, {
-                      type: 'text',
-                      name: 'definition',
-                      placeholder: 'Definition'
-                    });
-                  });
-                });
-                return _this.div({
-                  "class": 'ui green submit button'
-                }, 'Check');
-              });
-            });
-            return _this.div({
-              "class": 'column'
-            });
-          });
-        };
-      })(this));
-    };
-
-    StudyView.prototype.initialize = function(_arg) {
-      this.collection = _arg.collection;
-      this.model = this.collection.shift().clone();
-      this.initialize_form();
-      this.wordTitle.changeTo(this.capitalize(this.model.get('id')));
-      return this.model.on('change', (function(_this) {
-        return function(model) {
-          _this.wordTitle.changeTo(_this.capitalize(model.get('id')));
-          return _this.initialize_form();
-        };
-      })(this));
-    };
-
-    StudyView.prototype.initialize_form = function() {
-      var $form, definition, rules;
-      definition = this.model.get('definition');
-      rules = {
-        definition: {
-          identifier: 'definition',
-          rules: [
-            {
-              type: 'empty',
-              prompt: 'Give it a try'
-            }, {
-              type: "is[" + definition + "]",
-              prompt: "Sorry that's incorrect"
-            }
-          ]
-        }
-      };
-      return $form = this.find('.ui.form').form(rules, {
-        inline: true,
-        on: 'submit'
-      }).form('setting', {
-        onSuccess: (function(_this) {
-          return function() {
-            return _this.showNext();
-          };
-        })(this),
-        onFailure: (function(_this) {
-          return function() {
-            return console.log("The answer is " + definition);
-          };
-        })(this)
-      });
-    };
-
-    StudyView.prototype.showNext = function() {
-      var next_word;
-      if (next_word = this.collection.shift()) {
-        this.model.flush(next_word.attributes);
-        return this.find('input').val('');
-      } else {
-        Messenger().post({
-          message: 'There are no more words',
-          type: ''
-        });
-        return this.go('home');
-      }
-    };
-
-    return StudyView;
-
-  })(View),
   editWords: EditWords = (function(_super) {
     __extends(EditWords, _super);
 
@@ -1233,282 +1005,7 @@ EditWordsMenu = (function(_super) {
 
 })(View);
 
-StudyMenu = (function(_super) {
-  __extends(StudyMenu, _super);
-
-  function StudyMenu() {
-    return StudyMenu.__super__.constructor.apply(this, arguments);
-  }
-
-  StudyMenu.content = function() {
-    return this.div({
-      id: 'content'
-    }, (function(_this) {
-      return function() {
-        _this.a({
-          "class": 'item',
-          click: 'goHome'
-        }, function() {
-          return _this.raw("<i class='home icon'></i>Home");
-        });
-        return _this.a({
-          "class": 'item',
-          click: 'goAdd'
-        }, function() {
-          return _this.raw("<i class='add icon'></i>Add Words");
-        });
-      };
-    })(this));
-  };
-
-  StudyMenu.prototype.goHome = function() {
-    this.menu();
-    return this.go('home');
-  };
-
-  StudyMenu.prototype.goAdd = function() {
-    this.menu();
-    return this.go('addWords');
-  };
-
-  return StudyMenu;
-
-})(View);
-
-AddWordsMenu = (function(_super) {
-  __extends(AddWordsMenu, _super);
-
-  function AddWordsMenu() {
-    return AddWordsMenu.__super__.constructor.apply(this, arguments);
-  }
-
-  AddWordsMenu.content = function() {
-    return this.div({
-      id: 'content'
-    }, (function(_this) {
-      return function() {
-        _this.a({
-          "class": 'item',
-          click: 'goHome'
-        }, function() {
-          return _this.raw("<i class='home icon'></i>Home");
-        });
-        return _this.a({
-          "class": 'item',
-          click: 'goStudy'
-        }, function() {
-          return _this.raw("<i class='pencil icon'></i>Study");
-        });
-      };
-    })(this));
-  };
-
-  AddWordsMenu.prototype.goHome = function() {
-    this.menu();
-    return this.go('home');
-  };
-
-  AddWordsMenu.prototype.goStudy = function() {
-    this.menu();
-    return this.go('studyWords');
-  };
-
-  return AddWordsMenu;
-
-})(View);
-
-AddWordsForm = (function(_super) {
-  __extends(AddWordsForm, _super);
-
-  function AddWordsForm() {
-    return AddWordsForm.__super__.constructor.apply(this, arguments);
-  }
-
-  AddWordsForm.content = function() {
-    return this.div({
-      "class": 'ui form segment'
-    }, (function(_this) {
-      return function() {
-        _this.subview('typeDropdown', new TypeDropdown);
-        _this.div({
-          "class": 'field'
-        }, function() {
-          return _this.div({
-            "class": 'ui input'
-          }, function() {
-            return _this.input({
-              id: 'word-input',
-              type: 'text',
-              name: 'word',
-              placeholder: 'Word'
-            });
-          });
-        });
-        _this.div({
-          "class": 'field'
-        }, function() {
-          return _this.div({
-            "class": 'ui input'
-          }, function() {
-            return _this.input({
-              id: 'word-definition',
-              type: 'text',
-              name: 'definition',
-              placeholder: 'Definition'
-            });
-          });
-        });
-        return _this.div({
-          "class": 'ui green submit button'
-        }, 'Save');
-      };
-    })(this));
-  };
-
-  AddWordsForm.prototype.initialize = function() {
-    var $dropdown, rules;
-    rules = {
-      word: {
-        identifier: 'word',
-        rules: [
-          {
-            type: 'empty',
-            prompt: "Can't have a blank entry"
-          }, {
-            type: 'exists',
-            prompt: 'That word already exists'
-          }
-        ]
-      },
-      definition: {
-        identifier: 'definition',
-        rules: [
-          {
-            type: 'empty',
-            prompt: 'Need a definition'
-          }
-        ]
-      }
-    };
-    $.fn.form.settings.rules.empty = function(value) {
-      return !(value.length === 0);
-    };
-    $.fn.form.settings.rules.exists = function(value) {
-      return !Tutor.get('words').findWhere({
-        id: value
-      });
-    };
-    $dropdown = this.find('.ui.selection.dropdown').dropdown();
-    return this.form(rules, {
-      inline: true,
-      on: 'submit'
-    }).form('setting', {
-      onSuccess: (function(_this) {
-        return function() {
-          var attr, word;
-          attr = {};
-          attr.type = $dropdown.dropdown('get value');
-          if (_this.isString(attr.type)) {
-            attr.id = _this.form('get field', 'word').val();
-            attr.definition = _this.form('get field', 'definition').val();
-            word = new Word(attr);
-            return word.save({}, {
-              success: function(model) {
-                console.log('do it');
-                _this.form('get field', 'word').val('');
-                _this.form('get field', 'definition').val('');
-                return _this.find('#word-input').focus();
-              }
-            });
-          } else {
-            return Messenger().post({
-              message: 'Please choose a type',
-              type: ''
-            });
-          }
-        };
-      })(this)
-    });
-  };
-
-  return AddWordsForm;
-
-})(View);
-
-TypeDropdown = (function(_super) {
-  __extends(TypeDropdown, _super);
-
-  function TypeDropdown() {
-    return TypeDropdown.__super__.constructor.apply(this, arguments);
-  }
-
-  TypeDropdown.content = function() {
-    return this.div({
-      "class": 'field'
-    }, (function(_this) {
-      return function() {
-        return _this.div({
-          "class": 'ui selection dropdown'
-        }, function() {
-          _this.input({
-            type: 'hidden',
-            name: 'type'
-          });
-          _this.div({
-            "class": 'default text'
-          }, 'Type');
-          _this.i({
-            "class": 'dropdown icon'
-          });
-          return _this.div({
-            "class": 'menu ui transition hidden'
-          }, function() {
-            var type, _i, _len, _ref, _results;
-            _ref = ['Verb', 'Noun', 'Adjective', 'Stuff'];
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              type = _ref[_i];
-              _results.push(_this.div({
-                "class": 'item',
-                'data-value': type.toLowerCase()
-              }, type));
-            }
-            return _results;
-          });
-        });
-      };
-    })(this));
-  };
-
-  return TypeDropdown;
-
-})(View);
-
-WordTitle = (function(_super) {
-  __extends(WordTitle, _super);
-
-  function WordTitle() {
-    return WordTitle.__super__.constructor.apply(this, arguments);
-  }
-
-  WordTitle.content = function(word) {
-    if (word == null) {
-      word = '';
-    }
-    return this.div({
-      "class": 'ui teal medium center aligned header'
-    }, word);
-  };
-
-  WordTitle.prototype.changeTo = function(word) {
-    return this.html(word);
-  };
-
-  return WordTitle;
-
-})(View);
-
-var Word, Words, clone, extend, idCount, isArray, random, shuffle, uniqueId;
+var EventSystem, Word, Words, clone, extend, idCount, isArray, random, shuffle, uniqueId;
 
 extend = function(source, dest) {
   var key, value;
@@ -1570,7 +1067,7 @@ uniqueId = function(prefix) {
   }
 };
 
-Cosmo.Events = {
+EventSystem = {
   on: function(name, callback, context) {
     var todos;
     if (context == null) {
@@ -1664,7 +1161,7 @@ window.Word = Word = (function() {
     this.attributes = attributes != null ? attributes : {
       id: null
     };
-    extend(this, Cosmo.Events);
+    extend(this, EventSystem);
   }
 
   Word.prototype.set = function(attr, val) {
@@ -1746,7 +1243,7 @@ window.Words = Words = (function() {
     if (collection == null) {
       collection = [];
     }
-    extend(this, Cosmo.Events);
+    extend(this, EventSystem);
     this.collection = [];
     for (_i = 0, _len = collection.length; _i < _len; _i++) {
       word = collection[_i];
@@ -1808,7 +1305,7 @@ window.Words = Words = (function() {
     if (query == null) {
       query = {};
     }
-    return this.where(query)[0];
+    return this.where(query).first();
   };
 
   Words.prototype.remove = function(word) {
@@ -1841,6 +1338,14 @@ window.Words = Words = (function() {
     return shifted;
   };
 
+  Words.prototype.hasNext = function() {
+    if (this.collection.length >= 1) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   Words.prototype.shuffle = function() {
     var shuffled, toShuffle, word, _i, _len, _ref;
     toShuffle = [];
@@ -1850,18 +1355,7 @@ window.Words = Words = (function() {
       toShuffle.push(word.toJSON());
     }
     shuffled = shuffle(toShuffle);
-    return new this.constructor(shuffled);
-  };
-
-  Words.prototype._isEmpty = function(obj) {
-    var empty, key, value;
-    empty = true;
-    for (key in obj) {
-      value = obj[key];
-      empty = false;
-      break;
-    }
-    return empty;
+    return new Words(shuffled);
   };
 
   return Words;

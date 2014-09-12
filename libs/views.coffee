@@ -1,24 +1,20 @@
-View::go = (page, args...) ->
-  switch args.length
-    when 1 then Tutor.go page, args[0]
-    when 2 then Tutor.go page, args[0], args[1]
-    else Tutor.go page
+Navigation =
+  go: (url) -> Tutor.go(url)
 
-View::isString = (obj) ->
-  toString.call(obj).indexOf('String') isnt -1
-
-View::capitalize = (word) ->
-  word[0].toUpperCase() + word[1..-1].toLowerCase()
-
-View::menu = (view) -> Tutor.menu(view)
+StringTweaks =
+  capitalize: (word) ->
+    word[0].toUpperCase() + word[1..-1].toLowerCase()
 
 window.Views = {}
 
-## Btn component
+## UrlBtn component
+# Simple button that acts as a link
+#
 # @props url
 # @props text to display
 UrlBtn = React.createClass
-  onClick: (e) -> Tutor.go @props.url
+  mixins: [Navigation]
+  onClick: (e) -> @go @props.url
   render: ->
     {button} = _
     button onClick: @onClick, @props.text
@@ -35,19 +31,6 @@ Views.Home = React.createClass
           li(UrlBtn url: 'preStudy', text: 'Study')
           li(UrlBtn url: 'addWords', text: 'Add words')
           li(UrlBtn url: 'editWords', text: 'Edit words')
-
-Views.PreStudy = React.createClass
-  render: ->
-    {div, h2, h3, ul, li} = _
-    div className: 'text-center',
-      h2 'Study'
-      h3 'Study by type'
-      ul className: 'unstyled',
-        li(UrlBtn url: 'study/all', text: 'All')
-        li(UrlBtn url: 'study/verb', text: 'Verbs')
-        li(UrlBtn url: 'study/noun', text: 'Nouns')
-        li(UrlBtn url: 'study/adjective', text: 'Adjectives')
-        li(UrlBtn url: 'study/stuff', text: 'Stuff')
 
 Views.AddWords = React.createClass
   componentDidMount: -> @refs.word.getDOMNode().focus()
@@ -81,7 +64,7 @@ Views.AddWords = React.createClass
         definitionInput.value = ''
 
   render: ->
-    {div, h2, select, option, form, input, button} = _
+    {div, h2, select, option, form, input} = _
     div className: 'text-center',
       h2 'Add Words'
       form id: 'stacked',
@@ -89,132 +72,53 @@ Views.AddWords = React.createClass
           option value: 'verb', 'Verb'
           option value: 'adjective', 'Adjective'
           option value: 'noun', 'Noun'
-          option value: 'stuff', 'Stuf'
+          option value: 'stuff', 'Stuff'
         input id: 'word', ref: 'word', type: 'text', placeholder: 'Word'
         input id: 'definition', ref: 'definition', type: 'text', placeholder: 'Definition'
-        button id: 'save', onClick: @validate, 'Save'
+        input className: 'save', type: 'submit', onClick: @validate, value: 'Save'
+
+Views.PreStudy = React.createClass
+  render: ->
+    {div, h2, h3, ul, li} = _
+    div className: 'text-center',
+      h2 'Study'
+      h3 'Study by type'
+      ul className: 'unstyled',
+        li(UrlBtn url: 'study/all', text: 'All')
+        li(UrlBtn url: 'study/verb', text: 'Verbs')
+        li(UrlBtn url: 'study/noun', text: 'Nouns')
+        li(UrlBtn url: 'study/adjective', text: 'Adjectives')
+        li(UrlBtn url: 'study/stuff', text: 'Stuff')
+
+Views.Study = React.createClass
+  mixins: [StringTweaks]
+  getInitialState: -> { word: @props.collection.shift() }
+  getInitialProps: -> { wrongCount: 0 }
+
+  validate: (e) ->
+    e.preventDefault()
+    defInput = @refs.definition.getDOMNode()
+    if defInput.value is @state.word.get('definition')
+      defInput.classList.remove('error')
+      defInput.value = ''
+      if @props.collection.hasNext()
+        @setState word: @props.collection.shift()
+      else
+        @go 'index'
+        # Messenger.post 'No more words'
+    else
+      defInput.classList.add('error')
+
+  render: ->
+    {div, h2, h3, form, input} = _
+    div className: 'text-center',
+      h2 'Study'
+      h3 @capitalize(@state.word.get('id'))
+      form id: 'stacked',
+        input id: 'definition', ref: 'definition', type: 'text'
+        input className: 'save', type: 'submit', onClick: @validate, value: 'Check'
 
 foobar =
-  addWords: class AddWordsView extends View
-    @content: ->
-      @div id: 'content', =>
-        @div class: 'ui huge center aligned header', 'Add Words'
-        @div class: 'ui center aligned three column grid', =>
-          @div class: 'column'
-          @div class: 'column', =>
-            @subview 'addWordsForm', new AddWordsForm
-          @div class: 'column'
-
-    initialize: -> @menu new AddWordsMenu
-
-  preStudy: class ChooseWordsView extends View
-    @content: ->
-      @div id: 'content', =>
-        @div class: 'ui huge center aligned header', 'Study'
-        @div class: 'ui center aligned three column grid', =>
-          @div class: 'column'
-          @div class: 'column', =>
-            @div class: 'ui teal medium center aligned header', 'Study by type'
-            @div class: 'ui form segment', =>
-              @subview 'typeDropdown', new TypeDropdown
-              @div class: 'ui green submit button', 'Continue'
-          @div class: 'column'
-
-    initialize: ->
-      @menu new StudyMenu
-      # first add 'All' option to dropdown
-      @typeDropdown.find('.menu').prepend $$ ->
-        @div class: 'item', 'data-value': 'all', 'All'
-
-      rules =
-        type:
-          identifier: 'type'
-          rules: [
-            type: 'empty'
-            prompt: 'Need a type'
-          ]
-
-      $dropdown = @find('.ui.selection.dropdown').dropdown()
-      $form = @find('.ui.form')
-      $form.form rules, on: 'submit'
-      .form 'setting',
-        onSuccess: =>
-          word_type = $dropdown.dropdown('get value')
-          Tutor.get('db').all (words) =>
-            collection = new Words(words)
-            unless word_type is 'all'
-              collection = new Words(collection.where(type: word_type))
-            if collection.length is 0
-              Messenger().post
-                message: 'There are no words'
-                type: ''
-              @go 'home'
-            else
-              console.log collection
-              @go 'studyWords', collection.shuffle()
-        onFailure: ->
-          Messenger().post
-            message: 'Please choose which type of words to study'
-            type: ''
-
-  study: class StudyView extends View
-    @content: ->
-      @div id: 'content', =>
-        @div class: 'ui huge center aligned header', 'Study'
-        @div class: 'ui center aligned three column grid', =>
-          @div class: 'column'
-          @div class: 'column', =>
-            @subview 'wordTitle', new WordTitle
-            @div class: 'ui form segment', =>
-              @div class: 'field', =>
-                @div class: 'ui input', =>
-                  @input id: 'definition-input',
-                    type: 'text',
-                    name: 'definition',
-                    placeholder: 'Definition'
-              @div class: 'ui green submit button', 'Check'
-          @div class: 'column'
-
-    initialize: ({@collection}) ->
-      @model = @collection.shift().clone()
-      @initialize_form()
-      @wordTitle.changeTo @capitalize(@model.get('id'))
-      @model.on 'change', (model) =>
-        @wordTitle.changeTo @capitalize(model.get('id'))
-        @initialize_form()
-
-    initialize_form: ->
-      definition = @model.get('definition')
-      rules =
-        definition:
-          identifier: 'definition'
-          rules: [
-            {
-              type: 'empty'
-              prompt: 'Give it a try'
-            }, {
-              type: "is[" + definition + "]"
-              prompt: "Sorry that's incorrect"
-            }
-          ]
-
-      $form = @find('.ui.form').form(rules, inline: true, on: 'submit')
-      .form 'setting',
-        onSuccess: =>
-          @showNext()
-        onFailure: =>
-          console.log "The answer is #{definition}"
-
-    showNext: ->
-      if next_word = @collection.shift()
-        @model.flush(next_word.attributes)
-        @find('input').val ''
-      else
-        Messenger().post
-          message: 'There are no more words'
-          type: ''
-        @go 'home'
-
   editWords: class EditWords extends View
     @content: (collection) ->
       @div id: 'content', =>
@@ -318,113 +222,3 @@ class EditWordsMenu extends View
     @menu()
     @go 'studyWords'
 
-class StudyMenu extends View
-  @content: ->
-    @div id: 'content', =>
-      @a class: 'item', click: 'goHome', =>
-        @raw "<i class='home icon'></i>Home"
-      @a class: 'item', click: 'goAdd', =>
-        @raw "<i class='add icon'></i>Add Words"
-
-  goHome: ->
-    @menu()
-    @go 'home'
-
-  goAdd: ->
-    @menu()
-    @go 'addWords'
-
-class AddWordsMenu extends View
-  @content: ->
-    @div id: 'content', =>
-      @a class: 'item', click: 'goHome', =>
-        @raw "<i class='home icon'></i>Home"
-      @a class: 'item', click: 'goStudy', =>
-        @raw "<i class='pencil icon'></i>Study"
-
-  goHome: ->
-    @menu()
-    @go 'home'
-
-  goStudy: ->
-    @menu()
-    @go 'studyWords'
-
-class AddWordsForm extends View
-  @content: ->
-    @div class: 'ui form segment', =>
-      @subview 'typeDropdown', new TypeDropdown
-      @div class: 'field', =>
-        @div class: 'ui input', =>
-          @input id: 'word-input', type: 'text', name: 'word', placeholder: 'Word'
-      @div class: 'field', =>
-        @div class: 'ui input', =>
-          @input id: 'word-definition', type: 'text', name: 'definition', placeholder: 'Definition'
-      @div class: 'ui green submit button', 'Save'
-
-  initialize: ->
-    rules =
-      word:
-        identifier: 'word'
-        rules: [
-          {
-            type: 'empty',
-            prompt: "Can't have a blank entry"
-          }, {
-            type: 'exists'
-            prompt: 'That word already exists'
-          }
-        ]
-      definition:
-        identifier: 'definition'
-        rules: [
-          type: 'empty'
-          prompt: 'Need a definition'
-        ]
-
-    $.fn.form.settings.rules.empty = (value) ->
-      not (value.length is 0)
-
-    $.fn.form.settings.rules.exists = (value) ->
-      not Tutor.get('words').findWhere(id: value)
-
-    $dropdown = @find('.ui.selection.dropdown').dropdown()
-    # this is the form so call `this.form`
-    @form rules,
-      inline: true
-      on: 'submit'
-    .form 'setting',
-      onSuccess: =>
-        attr = {}
-        attr.type = $dropdown.dropdown('get value')
-        if @isString attr.type
-          attr.id = @form('get field', 'word').val()
-          attr.definition = @form('get field', 'definition').val()
-          word = new Word(attr)
-          word.save {}, success: (model) =>
-            console.log 'do it'
-            @form('get field', 'word').val ''
-            @form('get field', 'definition').val ''
-            @find('#word-input').focus()
-        else
-          Messenger().post
-            message: 'Please choose a type'
-            type: ''
-
-class TypeDropdown extends View
-  @content: ->
-    @div class: 'field', =>
-      @div class: 'ui selection dropdown', =>
-        @input type: 'hidden', name: 'type'
-        @div class: 'default text', 'Type'
-        @i class: 'dropdown icon'
-        @div class: 'menu ui transition hidden', =>
-          for type in ['Verb', 'Noun', 'Adjective', 'Stuff']
-            @div class: 'item', 'data-value': type.toLowerCase(), type
-
-class WordTitle extends View
-  @content: (word='') ->
-    @div class: 'ui teal medium center aligned header', word
-
-  changeTo: (word) ->
-    @html word

@@ -34,7 +34,7 @@ $(document).ready(function() {
       return React.renderComponent(component, this.container);
     };
 
-    App.prototype.home = function() {
+    App.prototype.index = function() {
       return this.render(new Views.Home);
     };
 
@@ -51,14 +51,14 @@ $(document).ready(function() {
       return collection = this.get('db').all((function(_this) {
         return function(words) {
           words = new Words(words);
-          if (type === 'all') {
-
-          } else {
+          if (type !== 'all') {
             words = words.where({
               type: type
             });
           }
-          return console.log(words);
+          return _this.render(new Views.Study({
+            collection: words.shuffle()
+          }));
         };
       })(this));
     };
@@ -79,14 +79,8 @@ $(document).ready(function() {
       })(this));
     };
 
-    App.prototype.menu = function(view) {
-      if (view == null) {
-        view = null;
-      }
-    };
-
     return App;
 
-  })(Cosmo.Router);
+  })(Router);
   return window.Tutor = new App().start();
 });

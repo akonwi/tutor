@@ -1,4 +1,5 @@
-## helper functions
+## Helper functions, mostly copied from underscore.js
+
 # very shallow merge
 extend = (source, dest) ->
   for key, value of dest
@@ -39,7 +40,7 @@ uniqueId = (prefix) ->
 
 ## Events mixin
 #  largely copied from Backbone
-Cosmo.Events =
+EventSystem =
   on: (name, callback, context=this) ->
     @events = @events or {}
     todos = @events[name] or []
@@ -86,8 +87,18 @@ Cosmo.Events =
     @listeningTo[id] = obj
     obj.once name, callback, context
 
+## Model for individual 'words'
+#
+# Can be instantiated with a set of initial attributes,
+#   which must include an 'id'.
+#
+# Events emitted:
+#   change
+#   change [attribute]
+#   save
+#   destroy
 window.Word = class Word
-  constructor: (@attributes={ id: null }) -> extend(this, Cosmo.Events)
+  constructor: (@attributes={ id: null }) -> extend(this, EventSystem)
 
   # Set attributes, but 'id' can't be overridden if it exists
   set: (attr, val) ->
@@ -130,11 +141,17 @@ window.Word = class Word
     Tutor.get('db').remove @get('id')
     @trigger 'destroy'
 
+## Model for a collection of words
+#
+# Can be instantiated with an initial array of words.
+#
+# Events emitted:
+#   change
 window.Words = class Words
   length: 0
 
   constructor: (collection=[]) ->
-    extend this, Cosmo.Events
+    extend this, EventSystem
     @collection = []
     for word in collection
       word = new Word(word)
@@ -166,7 +183,7 @@ window.Words = class Words
       new Words(results)
 
   findWhere: (query={}) ->
-    @where(query)[0]
+    @where(query).first()
 
   remove: (word) ->
     toKeep = []
@@ -188,16 +205,11 @@ window.Words = class Words
     @trigger 'change'
     return shifted
 
+  hasNext: -> if @collection.length >= 1 then true else false
+
   shuffle: ->
     toShuffle = []
     for word in @collection
       toShuffle.push word.toJSON()
     shuffled = shuffle(toShuffle)
-    new @constructor(shuffled)
-
-  _isEmpty: (obj) ->
-    empty = true
-    for key, value of obj
-      empty = false
-      break
-    empty
+    new Words(shuffled)

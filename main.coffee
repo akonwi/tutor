@@ -3,7 +3,7 @@ $(document).ready ->
     extraClasses: 'messenger-fixed messenger-on-top'
     theme: 'ice'
 
-  class App extends Cosmo.Router
+  class App extends Router
     container: document.getElementById('container')
 
     initialize: ->
@@ -11,14 +11,13 @@ $(document).ready ->
       @get('db').all (items) =>
         collection = new Words(items)
         @set 'words', collection
-        # when collection changes(add/remove) update it
         collection.on 'change', (newCollection) =>
           @set 'words', newCollection
 
     render: (component) ->
       React.renderComponent(component, @container)
 
-    home: -> @render new Views.Home
+    index: -> @render new Views.Home
 
     addWords: -> @render new Views.AddWords
 
@@ -27,12 +26,9 @@ $(document).ready ->
     study: (type) ->
       collection = @get('db').all (words) =>
         words = new Words(words)
-        if type is 'all'
-          # @render...
-        else
+        unless type is 'all'
           words = words.where type: type
-          # @render...
-        console.log words
+        @render new Views.Study(collection: words.shuffle())
 
     edit: ->
       @get('db').all (words) =>
@@ -43,13 +39,5 @@ $(document).ready ->
           Messenger().post
             message: "There are no words to edit"
             type: ''
-
-    # if no view, hide the sidebar
-    menu: (view=null) ->
-      #if view is null
-        #@regions.sidebar.hide()
-      #else
-        #@regions.sidebar.html view
-        #@regions.sidebar.show()
 
   window.Tutor = new App().start()
