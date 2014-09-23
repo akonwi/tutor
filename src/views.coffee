@@ -1,7 +1,7 @@
 Navigation =
   go: (url) -> Tutor.go(url)
 
-StringTweaks =
+StringHandling =
   capitalize: (word) ->
     word[0].toUpperCase() + word[1..-1].toLowerCase()
 
@@ -91,7 +91,7 @@ Views.PreStudy = React.createClass
         li(UrlBtn url: 'study/stuff', text: 'Stuff')
 
 Views.Study = React.createClass
-  mixins: [StringTweaks]
+  mixins: [StringHandling, Navigation]
   getInitialState: -> { word: @props.collection.shift() }
   getInitialProps: -> { wrongCount: 0 }
 
@@ -117,6 +117,43 @@ Views.Study = React.createClass
       form id: 'stacked',
         input id: 'definition', ref: 'definition', type: 'text'
         input className: 'save', type: 'submit', onClick: @validate, value: 'Check'
+
+EditWordForm = React.createClass
+  mixins: [StringHandling]
+
+  validate: (e) ->
+    e.preventDefault()
+    defInput = @refs.definition.getDOMNode()
+    if defInput.value.trim() is ''
+      defInput.classList.add 'error'
+    else
+      defInput.classList.remove 'error'
+      @props.word.save definition: defInput.value.trim()
+
+  delete: (e) ->
+    e.preventDefault()
+    #@props.word.destroy()
+    console.log @props
+
+  render: ->
+    {div, h3, form, input} = _
+    word = @props.word
+    div null,
+      h3 @capitalize(word.get('id'))
+      form id: 'stacked',
+        input ref: 'definition', type: 'text', defaultValue: word.get('definition')
+      input className: 'save', type: 'submit', onClick: @validate, value: 'Update'
+      input className: 'save', type: 'submit', onClick: @delete, value: 'Delete'
+
+Views.EditWords = React.createClass
+  render: ->
+    {div, h2} = _
+    words = []
+    @props.collection.each (word) ->
+      words.push new EditWordForm(word: word)
+    div className: 'text-center',
+      h2 'Edit'
+      words
 
 foobar =
   editWords: class EditWords extends View

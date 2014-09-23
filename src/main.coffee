@@ -24,17 +24,17 @@ $(document).ready ->
     preStudy: -> @render new Views.PreStudy
 
     study: (type) ->
-      collection = @get('db').all (words) =>
+      @get('db').all (words) =>
         words = new Words(words)
         unless type is 'all'
           words = words.where type: type
         @render new Views.Study(collection: words.shuffle())
 
-    edit: ->
+    editWords: ->
       @get('db').all (words) =>
         if words.length isnt 0
           words = new Words(words)
-          @render new Views.editWords(words)
+          @render new Views.EditWords(collection: words)
         else
           Messenger().post
             message: "There are no words to edit"

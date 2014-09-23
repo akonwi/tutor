@@ -4,13 +4,14 @@ module.exports = (grunt) ->
       compile:
         options:
           bare: true
-        files:
-          'background.js': 'background.coffee'
-          'app.js': [
-            'js/space-pen.coffee'
-            'libs/*.coffee'
-          ]
-          'main.js': 'main.coffee'
+        files: [
+          expand: true
+          flatten: true
+          cwd: 'src'
+          src: ['*.coffee']
+          dest: 'js'
+          ext: '.js'
+        ]
     sass:
       dist:
         options:

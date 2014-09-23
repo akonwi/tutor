@@ -47,8 +47,7 @@ $(document).ready(function() {
     };
 
     App.prototype.study = function(type) {
-      var collection;
-      return collection = this.get('db').all((function(_this) {
+      return this.get('db').all((function(_this) {
         return function(words) {
           words = new Words(words);
           if (type !== 'all') {
@@ -63,12 +62,14 @@ $(document).ready(function() {
       })(this));
     };
 
-    App.prototype.edit = function() {
+    App.prototype.editWords = function() {
       return this.get('db').all((function(_this) {
         return function(words) {
           if (words.length !== 0) {
             words = new Words(words);
-            return _this.render(new Views.editWords(words));
+            return _this.render(new Views.EditWords({
+              collection: words
+            }));
           } else {
             return Messenger().post({
               message: "There are no words to edit",

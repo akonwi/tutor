@@ -1,4 +1,4 @@
-class Router
+window.Router = class Router
   # store stuff
   _storage: {}
 
