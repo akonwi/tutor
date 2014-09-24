@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     App.prototype.container = document.getElementById('container');
 
+    App.prototype.nav = document.getElementsByTagName('nav')[0];
+
     App.prototype.initialize = function() {
       $.extend(this, Emitter);
       this.set('db', new Store);
@@ -36,7 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     App.prototype.index = function() {
-      return this.render(new Views.Home);
+      this.render(new Views.Home);
+      return React.renderComponent(new Views.NavBar, this.nav);
     };
 
     App.prototype.addWords = function() {

@@ -5,6 +5,7 @@ document.addEventListener 'DOMContentLoaded', ->
 
   class App extends Router
     container: document.getElementById('container')
+    nav: document.getElementsByTagName('nav')[0]
 
     initialize: ->
       $.extend(this, Emitter)
@@ -18,7 +19,9 @@ document.addEventListener 'DOMContentLoaded', ->
     render: (component) ->
       React.renderComponent(component, @container)
 
-    index: -> @render new Views.Home
+    index: ->
+      @render new Views.Home
+      React.renderComponent(new Views.NavBar, @nav)
 
     addWords: -> @render new Views.AddWords
 

@@ -14,12 +14,17 @@
   #{$property}: $remVals
 
 /* Base */
+*
+  box-sizing: border-box
+
 html
   font-size: 62.5%
+  height: 100%
 
 body
   font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif
   background: #FFFFFF
+  height: inherit
   margin: 0px
   padding: 0px
   color: #555555
@@ -29,11 +34,38 @@ body
   min-width: 320px
   overflow-y: scroll
 
+/* Utilities */
 .hidden
   display: none
 
 .text-center
   text-align: center
+
+/* Element Globals */
+nav
+  width: 60%
+  position: absolute
+  top: 90%
+  left: 80%
+  margin-right: 10%
+
+/* Flat buttons */
+button
+  outline: none
+  margin: 0
+  padding: .4rem .8rem
+  border: none
+  border-radius: .8rem
+  font-size: 1.2rem
+  background: #ECF0F1
+  color: black
+
+  &:hover
+    background: #BDC3C7
+
+/* Specific Elements */
+#container
+  height: 100%
 
 .unstyled
   list-style-type: none

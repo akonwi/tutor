@@ -1,6 +1,4 @@
-var EditWord, EditWordForm, EditWords, EditWordsMenu, Navigation, StringHandling, UrlBtn, WordSection, cx, foobar,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var EditWordForm, Navigation, StringHandling, UrlBtn, cx;
 
 Navigation = {
   go: function(url) {
@@ -277,260 +275,29 @@ Views.EditWords = React.createClass({
   }
 });
 
-foobar = {
-  editWords: EditWords = (function(_super) {
-    __extends(EditWords, _super);
-
-    function EditWords() {
-      return EditWords.__super__.constructor.apply(this, arguments);
-    }
-
-    EditWords.content = function(collection) {
-      return this.div({
-        id: 'content'
-      }, (function(_this) {
-        return function() {
-          _this.div({
-            "class": 'ui huge center aligned header'
-          }, 'Edit');
-          return _this.div({
-            "class": 'ui center aligned three column grid'
-          }, function() {
-            _this.div({
-              "class": 'column'
-            });
-            _this.div({
-              "class": 'column'
-            }, function() {
-              return _this.subview('wordSection', new WordSection(collection));
-            });
-            return _this.div({
-              "class": 'column'
-            });
-          });
-        };
-      })(this));
-    };
-
-    EditWords.prototype.initialize = function() {
-      return this.menu(new EditWordsMenu(this.wordSection));
-    };
-
-    return EditWords;
-
-  })(View)
-};
-
-WordSection = (function(_super) {
-  __extends(WordSection, _super);
-
-  function WordSection() {
-    return WordSection.__super__.constructor.apply(this, arguments);
-  }
-
-  WordSection.content = function(collection) {
-    this.subViews = [];
-    return this.div({
-      id: 'content'
-    }, (function(_this) {
-      return function() {
-        return collection.each(function(word) {
-          var view;
-          view = new EditWord(word);
-          _this.subViews.push(view);
-          return _this.subview('word', view);
-        });
-      };
-    })(this));
-  };
-
-  WordSection.prototype.initialize = function() {
-    return this.on('filterChange', (function(_this) {
-      return function(e, query) {
-        var view, _i, _len, _ref, _results;
-        _ref = _this.constructor.subViews;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          view = _ref[_i];
-          if (~view.word.get('id').indexOf(query)) {
-            _results.push(view.show());
-          } else {
-            _results.push(view.hide());
-          }
+Views.NavBar = React.createClass({
+  getInitialState: function() {
+    return {
+      urls: [
+        {
+          text: 'Home',
+          route: 'index'
         }
-        return _results;
-      };
-    })(this));
-  };
-
-  return WordSection;
-
-})(View);
-
-EditWord = (function(_super) {
-  __extends(EditWord, _super);
-
-  function EditWord() {
-    return EditWord.__super__.constructor.apply(this, arguments);
-  }
-
-  EditWord.content = function(word) {
-    this.word = word;
-    return this.div({
-      "class": 'ui form segment'
-    }, (function(_this) {
-      return function() {
-        _this.div({
-          "class": 'ui huge center header'
-        }, _this.word.get('id'));
-        _this.div({
-          "class": 'field'
-        }, function() {
-          return _this.div({
-            "class": 'ui input'
-          }, function() {
-            return _this.input({
-              id: 'definition-input'
-            }, {
-              type: 'text',
-              name: 'definition',
-              value: _this.word.get('definition'),
-              placeholder: 'Definition'
-            });
-          });
-        });
-        _this.div({
-          "class": 'ui green submit mini button'
-        }, 'Update');
-        return _this.div({
-          "class": 'ui red mini button',
-          click: 'delete'
-        }, 'Delete');
-      };
-    })(this));
-  };
-
-  EditWord.prototype.initialize = function(word) {
-    var rules;
-    this.word = word;
-    rules = {
-      definition: {
-        identifier: 'definition',
-        rules: [
-          {
-            type: 'empty',
-            prompt: "Can't be empty"
-          }
-        ]
-      }
+      ]
     };
-    return this.form(rules, {
-      inline: true,
-      on: 'submit'
-    }).form('setting', {
-      onSuccess: (function(_this) {
-        return function() {
-          return _this.word.save({
-            definition: new_def
-          });
-        };
-      })(this)
-    });
-  };
-
-  EditWord.prototype["delete"] = function() {
-    this.word.destroy();
-    return this.hide();
-  };
-
-  return EditWord;
-
-})(View);
-
-EditWordsMenu = (function(_super) {
-  __extends(EditWordsMenu, _super);
-
-  function EditWordsMenu() {
-    return EditWordsMenu.__super__.constructor.apply(this, arguments);
+  },
+  render: function() {
+    var buttons, li, route, text, ul, _i, _len, _ref, _ref1;
+    ul = _.ul, li = _.li;
+    buttons = {};
+    _ref = this.state.urls;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      _ref1 = _ref[_i], route = _ref1.route, text = _ref1.text;
+      buttons[route] = new UrlBtn({
+        url: route,
+        text: text
+      });
+    }
+    return ul(null, buttons);
   }
-
-  EditWordsMenu.content = function() {
-    return this.div({
-      id: 'content'
-    }, (function(_this) {
-      return function() {
-        _this.div({
-          "class": 'item'
-        }, function() {
-          return _this.div({
-            "class": 'ui form'
-          }, function() {
-            return _this.div({
-              "class": 'field'
-            }, function() {
-              return _this.div({
-                "class": 'ui small icon input'
-              }, function() {
-                _this.input({
-                  id: 'search-input'
-                }, {
-                  type: 'text',
-                  name: 'search',
-                  placeholder: 'Search'
-                });
-                return _this.i({
-                  "class": 'search icon'
-                });
-              });
-            });
-          });
-        });
-        _this.a({
-          "class": 'item',
-          click: 'goHome'
-        }, function() {
-          return _this.raw("<i class='home icon'></i>Home");
-        });
-        _this.a({
-          "class": 'item',
-          click: 'goAdd'
-        }, function() {
-          return _this.raw("<i class='add icon'></i>Add Words");
-        });
-        return _this.a({
-          "class": 'item',
-          click: 'goStudy'
-        }, function() {
-          return _this.raw("<i class='pencil icon'></i>Study");
-        });
-      };
-    })(this));
-  };
-
-  EditWordsMenu.prototype.initialize = function(wordSection) {
-    var searchInput;
-    return searchInput = this.find('input').on('input', (function(_this) {
-      return function() {
-        return wordSection.trigger('filterChange', searchInput.val());
-      };
-    })(this));
-  };
-
-  EditWordsMenu.prototype.goHome = function() {
-    this.menu();
-    return this.go('home');
-  };
-
-  EditWordsMenu.prototype.goAdd = function() {
-    this.menu();
-    return this.go('addWords');
-  };
-
-  EditWordsMenu.prototype.goStudy = function() {
-    this.menu();
-    return this.go('studyWords');
-  };
-
-  return EditWordsMenu;
-
-})(View);
+});

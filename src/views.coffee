@@ -160,3 +160,22 @@ Views.EditWords = React.createClass
     div className: 'text-center',
       h2 'Edit'
       forms
+
+Views.NavBar = React.createClass
+  getInitialState: ->
+    {
+      urls: [
+        {
+          text: 'Home'
+          route: 'index'
+        }
+      ]
+    }
+
+  render: ->
+    {ul, li} = _
+    buttons = {}
+    for {route, text} in @state.urls
+      buttons[route] = new UrlBtn(url: route, text: text)
+    ul null, buttons
+
