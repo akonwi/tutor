@@ -1,43 +1,3 @@
-## Helper functions, mostly copied from underscore.js
-
-# very shallow merge
-extend = (source, dest) ->
-  for key, value of dest
-    source[key] = value
-  null
-
-clone = (obj)->
-  twin = null
-  if isArray obj
-    twin = obj.slice()
-  else
-    twin = {}
-    for key, value of obj
-      twin[key] = value
-  twin
-
-isArray = (obj) ->
-  toString.call(obj).indexOf('Array') isnt -1
-
-random = (min, max) ->
-  unless max?
-    max = min
-    min = 0
-  min + Math.floor(Math.random() * (max - min + 1))
-
-shuffle = (array) ->
-  shuffled = []
-  for obj, index in array
-    rand = random(index++)
-    shuffled[index - 1] = shuffled[rand]
-    shuffled[rand] = obj
-  shuffled
-
-idCount = 0
-uniqueId = (prefix) ->
-  id = ++idCounter + ''
-  if prefix then prefix + id else id
-
 ## Model for individual 'words'
 #
 # Can be instantiated with a set of initial attributes,
@@ -49,7 +9,7 @@ uniqueId = (prefix) ->
 #   save
 #   destroy
 window.Word = class Word
-  constructor: (@attributes={ id: null }) -> extend(this, EventSystem)
+  constructor: (@attributes={ id: null }) -> $.extend this, Emitter
 
   # Set attributes, but 'id' can't be overridden if it exists
   set: (attr, val) ->
@@ -75,9 +35,9 @@ window.Word = class Word
   # complete overwrite of @attributes
   flush: (@attributes) ->
 
-  clone: -> new @constructor(clone(@attributes))
+  clone: -> new @constructor($.clone(@attributes))
 
-  toJSON: -> clone(@attributes)
+  toJSON: -> $.clone(@attributes)
 
   save: (attrs=null, {success, error}={}) ->
     @set attrs if attrs?
@@ -102,7 +62,7 @@ window.Words = class Words
   length: 0
 
   constructor: (collection=[]) ->
-    extend this, EventSystem
+    $.extend this, Emitter
     @collection = []
     for word in collection
       word = new Word(word)
@@ -151,15 +111,16 @@ window.Words = class Words
     @trigger 'change'
 
   shift: ->
-    length = @collection.length - 1
     shifted = @collection.shift()
+    length = @collection.length
     @trigger 'change'
     return shifted
 
   hasNext: -> if @collection.length >= 1 then true else false
 
+  # in place shuffle
   shuffle: ->
-    @collection = shuffle(@collection)
+    @collection = $.shuffle(@collection)
     #toShuffle = []
     #for word in @collection
       #toShuffle.push word.toJSON()

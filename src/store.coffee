@@ -1,12 +1,6 @@
 storage = chrome.storage.local
 runtime = chrome.runtime
 
-toArray = (obj) ->
-  array = []
-  for key, value of obj
-    array.push value
-  array
-
 # simple wrapper class for chrome.storage.local
 window.Store = class Store
   # given a pure json object, it will be saved with it's 'id' as the key
@@ -24,7 +18,7 @@ window.Store = class Store
   # follows chrome api but results given to callback will be an array
   get: (key, func) ->
     storage.get key, (results) ->
-      func.call this, toArray(results)
+      func.call this, $.toArray(results)
 
   # like ::get but returns only the first result
   getOne: (key, func) ->
@@ -34,7 +28,7 @@ window.Store = class Store
   # chrome api will return an object so convert it to array
   all: (func) ->
     storage.get null, (items) ->
-      func.call this, toArray(items)
+      func.call this, $.toArray(items)
 
   # follows chrome api but callback is given error
   remove: (key, func) ->

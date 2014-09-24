@@ -1,7 +1,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
   var App;
   Messenger.options = {
     extraClasses: 'messenger-fixed messenger-on-top',
@@ -17,6 +17,7 @@ $(document).ready(function() {
     App.prototype.container = document.getElementById('container');
 
     App.prototype.initialize = function() {
+      $.extend(this, Emitter);
       this.set('db', new Store);
       return this.get('db').all((function(_this) {
         return function(items) {
@@ -55,9 +56,13 @@ $(document).ready(function() {
               type: type
             });
           }
-          return _this.render(new Views.Study({
-            collection: words.shuffle()
-          }));
+          if (words.length === 0) {
+            return _this.index();
+          } else {
+            return _this.render(new Views.Study({
+              collection: words.shuffle()
+            }));
+          }
         };
       })(this));
     };

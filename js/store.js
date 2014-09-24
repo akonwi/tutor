@@ -1,18 +1,8 @@
-var Store, runtime, storage, toArray;
+var Store, runtime, storage;
 
 storage = chrome.storage.local;
 
 runtime = chrome.runtime;
-
-toArray = function(obj) {
-  var array, key, value;
-  array = [];
-  for (key in obj) {
-    value = obj[key];
-    array.push(value);
-  }
-  return array;
-};
 
 window.Store = Store = (function() {
   function Store() {}
@@ -37,7 +27,7 @@ window.Store = Store = (function() {
 
   Store.prototype.get = function(key, func) {
     return storage.get(key, function(results) {
-      return func.call(this, toArray(results));
+      return func.call(this, $.toArray(results));
     });
   };
 
@@ -49,7 +39,7 @@ window.Store = Store = (function() {
 
   Store.prototype.all = function(func) {
     return storage.get(null, function(items) {
-      return func.call(this, toArray(items));
+      return func.call(this, $.toArray(items));
     });
   };
 

@@ -1,4 +1,4 @@
-var EditWord, EditWordForm, EditWords, EditWordsMenu, Navigation, StringHandling, UrlBtn, WordSection, foobar,
+var EditWord, EditWordForm, EditWords, EditWordsMenu, Navigation, StringHandling, UrlBtn, WordSection, cx, foobar,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -13,6 +13,8 @@ StringHandling = {
     return word[0].toUpperCase() + word.slice(1).toLowerCase();
   }
 };
+
+cx = React.addons.classSet;
 
 window.Views = {};
 
@@ -204,6 +206,11 @@ Views.Study = React.createClass({
 
 EditWordForm = React.createClass({
   mixins: [StringHandling],
+  getInitialState: function() {
+    return {
+      hidden: false
+    };
+  },
   validate: function(e) {
     var defInput;
     e.preventDefault();
@@ -219,13 +226,21 @@ EditWordForm = React.createClass({
   },
   "delete": function(e) {
     e.preventDefault();
-    return console.log(this.props);
+    this.props.word.destroy();
+    return this.setState({
+      hidden: true
+    });
   },
   render: function() {
-    var div, form, h3, input, word;
+    var classes, div, form, h3, input, word;
     div = _.div, h3 = _.h3, form = _.form, input = _.input;
     word = this.props.word;
-    return div(null, h3(this.capitalize(word.get('id'))), form({
+    classes = cx({
+      'hidden': this.state.hidden
+    });
+    return div({
+      className: classes
+    }, h3(this.capitalize(word.get('id'))), form({
       id: 'stacked'
     }, input({
       ref: 'definition',
@@ -247,17 +262,18 @@ EditWordForm = React.createClass({
 
 Views.EditWords = React.createClass({
   render: function() {
-    var div, h2, words;
+    var div, forms, h2;
     div = _.div, h2 = _.h2;
-    words = [];
+    forms = [];
     this.props.collection.each(function(word) {
-      return words.push(new EditWordForm({
+      console.log(word.get('id'));
+      return forms.push(new EditWordForm({
         word: word
       }));
     });
     return div({
       className: 'text-center'
-    }, h2('Edit'), words);
+    }, h2('Edit'), forms);
   }
 });
 

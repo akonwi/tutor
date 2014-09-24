@@ -1,4 +1,4 @@
-$(document).ready ->
+document.addEventListener 'DOMContentLoaded', ->
   Messenger.options =
     extraClasses: 'messenger-fixed messenger-on-top'
     theme: 'ice'
@@ -7,6 +7,7 @@ $(document).ready ->
     container: document.getElementById('container')
 
     initialize: ->
+      $.extend(this, Emitter)
       @set 'db', new Store
       @get('db').all (items) =>
         collection = new Words(items)
@@ -28,7 +29,10 @@ $(document).ready ->
         words = new Words(words)
         unless type is 'all'
           words = words.where type: type
-        @render new Views.Study(collection: words.shuffle())
+        if words.length is 0
+          @index()
+        else
+          @render new Views.Study(collection: words.shuffle())
 
     editWords: ->
       @get('db').all (words) =>

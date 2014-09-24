@@ -1,4 +1,4 @@
-window.EventSystem = {
+window.Emitter = {
   on: function(name, callback, context) {
     var todos;
     if (context == null) {
@@ -71,7 +71,7 @@ window.EventSystem = {
       context = this;
     }
     this.listeningTo = this.listeningTo || {};
-    id = obj.listenId = uniqueId('l');
+    id = obj.listenId = $.uniqueId('l');
     this.listeningTo[id] = obj;
     return obj.on(name, callback, context);
   },
@@ -81,7 +81,7 @@ window.EventSystem = {
       context = this;
     }
     this.listeningTo = this.listeningTo || {};
-    id = obj.listenId = uniqueId('l');
+    id = obj.listenId = $.uniqueId('l');
     this.listeningTo[id] = obj;
     return obj.once(name, callback, context);
   }

@@ -1,71 +1,11 @@
-var Word, Words, clone, extend, idCount, isArray, random, shuffle, uniqueId;
-
-extend = function(source, dest) {
-  var key, value;
-  for (key in dest) {
-    value = dest[key];
-    source[key] = value;
-  }
-  return null;
-};
-
-clone = function(obj) {
-  var key, twin, value;
-  twin = null;
-  if (isArray(obj)) {
-    twin = obj.slice();
-  } else {
-    twin = {};
-    for (key in obj) {
-      value = obj[key];
-      twin[key] = value;
-    }
-  }
-  return twin;
-};
-
-isArray = function(obj) {
-  return toString.call(obj).indexOf('Array') !== -1;
-};
-
-random = function(min, max) {
-  if (max == null) {
-    max = min;
-    min = 0;
-  }
-  return min + Math.floor(Math.random() * (max - min + 1));
-};
-
-shuffle = function(array) {
-  var index, obj, rand, shuffled, _i, _len;
-  shuffled = [];
-  for (index = _i = 0, _len = array.length; _i < _len; index = ++_i) {
-    obj = array[index];
-    rand = random(index++);
-    shuffled[index - 1] = shuffled[rand];
-    shuffled[rand] = obj;
-  }
-  return shuffled;
-};
-
-idCount = 0;
-
-uniqueId = function(prefix) {
-  var id;
-  id = ++idCounter + '';
-  if (prefix) {
-    return prefix + id;
-  } else {
-    return id;
-  }
-};
+var Word, Words;
 
 window.Word = Word = (function() {
   function Word(attributes) {
     this.attributes = attributes != null ? attributes : {
       id: null
     };
-    extend(this, EventSystem);
+    $.extend(this, Emitter);
   }
 
   Word.prototype.set = function(attr, val) {
@@ -102,11 +42,11 @@ window.Word = Word = (function() {
   };
 
   Word.prototype.clone = function() {
-    return new this.constructor(clone(this.attributes));
+    return new this.constructor($.clone(this.attributes));
   };
 
   Word.prototype.toJSON = function() {
-    return clone(this.attributes);
+    return $.clone(this.attributes);
   };
 
   Word.prototype.save = function(attrs, _arg) {
@@ -147,7 +87,7 @@ window.Words = Words = (function() {
     if (collection == null) {
       collection = [];
     }
-    extend(this, EventSystem);
+    $.extend(this, Emitter);
     this.collection = [];
     for (_i = 0, _len = collection.length; _i < _len; _i++) {
       word = collection[_i];
@@ -236,8 +176,8 @@ window.Words = Words = (function() {
 
   Words.prototype.shift = function() {
     var length, shifted;
-    length = this.collection.length - 1;
     shifted = this.collection.shift();
+    length = this.collection.length;
     this.trigger('change');
     return shifted;
   };
@@ -251,7 +191,7 @@ window.Words = Words = (function() {
   };
 
   Words.prototype.shuffle = function() {
-    this.collection = shuffle(this.collection);
+    this.collection = $.shuffle(this.collection);
     return this;
   };
 

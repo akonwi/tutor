@@ -5,6 +5,8 @@ StringHandling =
   capitalize: (word) ->
     word[0].toUpperCase() + word[1..-1].toLowerCase()
 
+cx = React.addons.classSet
+
 window.Views = {}
 
 ## UrlBtn component
@@ -121,6 +123,8 @@ Views.Study = React.createClass
 EditWordForm = React.createClass
   mixins: [StringHandling]
 
+  getInitialState: -> { hidden: false }
+
   validate: (e) ->
     e.preventDefault()
     defInput = @refs.definition.getDOMNode()
@@ -132,13 +136,14 @@ EditWordForm = React.createClass
 
   delete: (e) ->
     e.preventDefault()
-    #@props.word.destroy()
-    console.log @props
+    @props.word.destroy()
+    @setState hidden: true
 
   render: ->
     {div, h3, form, input} = _
     word = @props.word
-    div null,
+    classes = cx('hidden': @state.hidden)
+    div className: classes,
       h3 @capitalize(word.get('id'))
       form id: 'stacked',
         input ref: 'definition', type: 'text', defaultValue: word.get('definition')
@@ -148,114 +153,10 @@ EditWordForm = React.createClass
 Views.EditWords = React.createClass
   render: ->
     {div, h2} = _
-    words = []
+    forms = []
     @props.collection.each (word) ->
-      words.push new EditWordForm(word: word)
+      console.log word.get('id')
+      forms.push new EditWordForm(word: word)
     div className: 'text-center',
       h2 'Edit'
-      words
-
-foobar =
-  editWords: class EditWords extends View
-    @content: (collection) ->
-      @div id: 'content', =>
-        @div class: 'ui huge center aligned header', 'Edit'
-        @div class: 'ui center aligned three column grid', =>
-          @div class: 'column'
-          @div class: 'column', =>
-            @subview 'wordSection', new WordSection(collection)
-          @div class: 'column'
-
-    initialize: -> @menu new EditWordsMenu(@wordSection)
-
-class WordSection extends View
-  @content: (collection) ->
-    # collection of subviews for each word to edit
-    @subViews = []
-    @div id: 'content', =>
-      collection.each (word) =>
-        view = new EditWord(word)
-        @subViews.push view
-        @subview 'word', view
-
-  initialize: ->
-    # filter which words are shown based on user input
-    @on 'filterChange', (e, query) =>
-      for view in @constructor.subViews
-        if ~view.word.get('id').indexOf query
-          view.show()
-        else
-          view.hide()
-
-class EditWord extends View
-  @content: (@word) ->
-    @div class: 'ui form segment', =>
-      @div class: 'ui huge center header', @word.get('id')
-      @div class: 'field', =>
-        @div class: 'ui input', =>
-          @input id: 'definition-input',
-            type: 'text',
-            name: 'definition',
-            value: @word.get('definition'),
-            placeholder: 'Definition'
-      @div class: 'ui green submit mini button', 'Update'
-      @div class: 'ui red mini button', click: 'delete', 'Delete'
-
-  initialize: (@word) ->
-    rules =
-      definition:
-        identifier: 'definition'
-        rules: [
-          {
-            type: 'empty'
-            prompt: "Can't be empty"
-          }
-        ]
-
-    @form rules, inline: true, on: 'submit'
-    .form 'setting',
-      onSuccess: =>
-        @word.save definition: new_def
-
-  delete: ->
-    @word.destroy()
-    @hide()
-
-class EditWordsMenu extends View
-  @content: ->
-    @div id: 'content', =>
-      @div class: 'item', =>
-        @div class: 'ui form', =>
-          @div class: 'field', =>
-            @div class: 'ui small icon input', =>
-              @input id: 'search-input',
-                type: 'text',
-                name: 'search',
-                placeholder: 'Search'
-              @i class: 'search icon'
-      @a class: 'item', click: 'goHome', =>
-        @raw "<i class='home icon'></i>Home"
-      @a class: 'item', click: 'goAdd', =>
-        @raw "<i class='add icon'></i>Add Words"
-      @a class: 'item', click: 'goStudy', =>
-        @raw "<i class='pencil icon'></i>Study"
-
-  # given the view that is displaying words,
-  # trigger updating filter as user types query
-  initialize: (wordSection) ->
-    searchInput = @find('input')
-    .on 'input', =>
-      wordSection.trigger 'filterChange', searchInput.val()
-
-  goHome: ->
-    @menu()
-    @go 'home'
-
-  goAdd: ->
-    @menu()
-    @go 'addWords'
-
-  goStudy: ->
-    @menu()
-    @go 'studyWords'
-
+      forms

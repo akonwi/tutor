@@ -1,6 +1,6 @@
 ## Events mixin
 #  largely copied from Backbone
-window.EventSystem =
+window.Emitter =
   on: (name, callback, context=this) ->
     @events = @events or {}
     todos = @events[name] or []
@@ -37,13 +37,12 @@ window.EventSystem =
 
   listenTo: (obj, name, callback, context=this) ->
     @listeningTo = @listeningTo or {}
-    id = obj.listenId = uniqueId('l')
+    id = obj.listenId = $.uniqueId('l')
     @listeningTo[id] = obj
     obj.on name, callback, context
 
   listenToOnce: (obj, name, callback, context=this) ->
     @listeningTo = @listeningTo or {}
-    id = obj.listenId = uniqueId('l')
+    id = obj.listenId = $.uniqueId('l')
     @listeningTo[id] = obj
     obj.once name, callback, context
-
