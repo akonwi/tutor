@@ -147,8 +147,8 @@ EditWordForm = React.createClass
       h3 @capitalize(word.get('id'))
       form id: 'stacked',
         input ref: 'definition', type: 'text', defaultValue: word.get('definition')
-      input className: 'save', type: 'submit', onClick: @validate, value: 'Update'
-      input className: 'save', type: 'submit', onClick: @delete, value: 'Delete'
+      input className: 'save green', type: 'submit', onClick: @validate, value: 'Update'
+      input className: 'save red', type: 'submit', onClick: @delete, value: 'Delete'
 
 Views.EditWords = React.createClass
   render: ->

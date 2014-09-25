@@ -245,12 +245,12 @@ EditWordForm = React.createClass({
       type: 'text',
       defaultValue: word.get('definition')
     })), input({
-      className: 'save',
+      className: 'save green',
       type: 'submit',
       onClick: this.validate,
       value: 'Update'
     }), input({
-      className: 'save',
+      className: 'save red',
       type: 'submit',
       onClick: this["delete"],
       value: 'Delete'
