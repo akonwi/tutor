@@ -1,7 +1,8 @@
 /* Colors */
-$light-grey: #ECF0F1
+$light-grey: #e2e2e2
 $grey: #BDC3C7
-$dark-grey: #6C7A89
+$red: #e74c3c
+$green: #27ae60
 
 =center-block
   display: block
@@ -9,13 +10,10 @@ $dark-grey: #6C7A89
 
 =rem($property, $pxVal)
   $remVals: ()
-  $pxVals: ()
 
   @each $val in $pxVal
     $remVals: append($remVals, ($val / 10 + rem))
-    $pxVals: append($pxVals, $val + px)
 
-  #{$property}: $pxVals
   #{$property}: $remVals
 
 /* Base */
@@ -28,15 +26,15 @@ html
 
 body
   font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif
-  background: #FFFFFF
+  background: $light-grey
   height: inherit
+  min-width: 100%
   margin: 0px
   padding: 0px
   color: #555555
   line-height: 1.5
-  +rem(font-size, 16)
+  font-size: 1.6rem
   text-rendering: optimizeLegibility
-  min-width: 320px
   overflow-y: scroll
   position: relative // for navbar
 
@@ -47,7 +45,14 @@ body
 .text-center
   text-align: center
 
+.green
+  background: $green !important
+  color: white !important
+
 /* Element Globals */
+h3, h2, h1
+  margin: 0
+
 nav
   width: 100%
   position: absolute
@@ -66,8 +71,9 @@ button, input[type="submit"]
   border: none
   border-radius: .8rem
   font-size: 1.2rem
-  background: $light-grey
+  background: white
   color: black
+  cursor: pointer
 
   &:hover
     background: $grey
@@ -85,12 +91,10 @@ button, input[type="submit"]
     +rem(margin, 10)
 
 .error
-  border-color: red
-  color: red
+  border: .1rem solid $red !important
   &:focus
     outline: none !important
-    box-shadow: 0 0 1rem red
-    box-shadow: 0 0 10px red
+    box-shadow: none //0 0 1rem #e74c3c
 
 #container
   width: 60%
@@ -98,13 +102,13 @@ button, input[type="submit"]
   margin: 0 auto 0 auto
 
 #stacked
-  background: $grey
   width: 70%
   display: block
   margin: 0 auto 0 auto
   padding: .5rem 0 .5rem 0
   select
     width: 50%
+    background: white
   input:not(.save)
     width: 80%
     display: block

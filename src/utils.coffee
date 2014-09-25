@@ -1,4 +1,8 @@
 ## Helper functions, mostly copied from underscore.js
+
+# keep track of ids
+idCount = 0
+
 window.$ =
   # very shallow merge of objects
   # actually extends classes
@@ -39,14 +43,11 @@ window.$ =
   shuffle: (array) ->
     shuffled = []
     for obj, index in array
-      rand = random(index++)
+      rand = @random(index++)
       shuffled[index - 1] = shuffled[rand]
       shuffled[rand] = obj
     shuffled
 
-  # keep track of ids
-  idCount: 0
-
   uniqueId: (prefix) ->
-    id = ++@idCounter + ''
+    id = idCount + ''
     if prefix then prefix + id else id

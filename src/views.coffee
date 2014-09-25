@@ -77,7 +77,7 @@ Views.AddWords = React.createClass
           option value: 'stuff', 'Stuff'
         input id: 'word', ref: 'word', type: 'text', placeholder: 'Word'
         input id: 'definition', ref: 'definition', type: 'text', placeholder: 'Definition'
-        input className: 'save', type: 'submit', onClick: @validate, value: 'Save'
+        input className: 'save green', type: 'submit', onClick: @validate, value: 'Save'
 
 Views.PreStudy = React.createClass
   render: ->
@@ -118,7 +118,7 @@ Views.Study = React.createClass
       h3 @capitalize(@state.word.get('id'))
       form id: 'stacked',
         input id: 'definition', ref: 'definition', type: 'text'
-        input className: 'save', type: 'submit', onClick: @validate, value: 'Check'
+        input className: 'save green', type: 'submit', onClick: @validate, value: 'Check'
 
 EditWordForm = React.createClass
   mixins: [StringHandling]

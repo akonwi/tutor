@@ -117,7 +117,7 @@ Views.AddWords = React.createClass({
       type: 'text',
       placeholder: 'Definition'
     }), input({
-      className: 'save',
+      className: 'save green',
       type: 'submit',
       onClick: this.validate,
       value: 'Save'
@@ -194,7 +194,7 @@ Views.Study = React.createClass({
       ref: 'definition',
       type: 'text'
     }), input({
-      className: 'save',
+      className: 'save green',
       type: 'submit',
       onClick: this.validate,
       value: 'Check'

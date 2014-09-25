@@ -1,3 +1,7 @@
+var idCount;
+
+idCount = 0;
+
 window.$ = {
   extend: function(source, ext) {
     var k, v;
@@ -52,16 +56,15 @@ window.$ = {
     shuffled = [];
     for (index = _i = 0, _len = array.length; _i < _len; index = ++_i) {
       obj = array[index];
-      rand = random(index++);
+      rand = this.random(index++);
       shuffled[index - 1] = shuffled[rand];
       shuffled[rand] = obj;
     }
     return shuffled;
   },
-  idCount: 0,
   uniqueId: function(prefix) {
     var id;
-    id = ++this.idCounter + '';
+    id = idCount + '';
     if (prefix) {
       return prefix + id;
     } else {
