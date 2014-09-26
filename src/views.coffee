@@ -155,24 +155,18 @@ Views.EditWords = React.createClass
     {div, h2} = _
     forms = []
     @props.collection.each (word) ->
-      console.log word.get('id')
       forms.push new EditWordForm(word: word)
     div className: 'text-center',
       h2 'Edit'
       forms
 
 Views.NavBar = React.createClass
-  getInitialState: ->
-    {
-      urls: [
-        {
-          text: 'Home'
-          route: 'index'
-        }
-      ]
-    }
-
+  getInitialState: -> {urls: [], count: 0}
   render: ->
+    @props.app.on 'change:menu', (urls) =>
+      count = @state.count + 1
+      console.log "called #{count}"
+      @setState(urls: urls, count: count)
     {ul, li} = _
     buttons = {}
     for {route, text} in @state.urls

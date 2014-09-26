@@ -264,7 +264,6 @@ Views.EditWords = React.createClass({
     div = _.div, h2 = _.h2;
     forms = [];
     this.props.collection.each(function(word) {
-      console.log(word.get('id'));
       return forms.push(new EditWordForm({
         word: word
       }));
@@ -278,16 +277,23 @@ Views.EditWords = React.createClass({
 Views.NavBar = React.createClass({
   getInitialState: function() {
     return {
-      urls: [
-        {
-          text: 'Home',
-          route: 'index'
-        }
-      ]
+      urls: [],
+      count: 0
     };
   },
   render: function() {
     var buttons, li, route, text, ul, _i, _len, _ref, _ref1;
+    this.props.app.on('change:menu', (function(_this) {
+      return function(urls) {
+        var count;
+        count = _this.state.count + 1;
+        console.log("called " + count);
+        return _this.setState({
+          urls: urls,
+          count: count
+        });
+      };
+    })(this));
     ul = _.ul, li = _.li;
     buttons = {};
     _ref = this.state.urls;

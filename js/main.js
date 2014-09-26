@@ -2,10 +2,28 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 document.addEventListener('DOMContentLoaded', function() {
-  var App;
+  var App, URLS;
   Messenger.options = {
     extraClasses: 'messenger-fixed messenger-on-top',
     theme: 'ice'
+  };
+  URLS = {
+    home: {
+      route: 'index',
+      text: 'Home'
+    },
+    study: {
+      route: 'preStudy',
+      text: 'Study'
+    },
+    edit: {
+      route: 'editWords',
+      text: 'Edit'
+    },
+    add: {
+      route: 'addWords',
+      text: 'Add'
+    }
   };
   App = (function(_super) {
     __extends(App, _super);
@@ -21,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     App.prototype.initialize = function() {
       $.extend(this, Emitter);
       this.set('db', new Store);
-      return this.get('db').all((function(_this) {
+      this.get('db').all((function(_this) {
         return function(items) {
           var collection;
           collection = new Words(items);
@@ -31,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         };
       })(this));
+      return React.renderComponent(new Views.NavBar({
+        app: this
+      }), this.nav);
     };
 
     App.prototype.render = function(component) {
@@ -39,15 +60,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     App.prototype.index = function() {
       this.render(new Views.Home);
-      return React.renderComponent(new Views.NavBar, this.nav);
+      return this.trigger('change:menu', []);
     };
 
     App.prototype.addWords = function() {
-      return this.render(new Views.AddWords);
+      this.render(new Views.AddWords);
+      return this.trigger('change:menu', [URLS.home, URLS.study, URLS.edit]);
     };
 
     App.prototype.preStudy = function() {
-      return this.render(new Views.PreStudy);
+      this.render(new Views.PreStudy);
+      return this.trigger('change:menu', [URLS.home, URLS.add, URLS.edit]);
     };
 
     App.prototype.study = function(type) {
@@ -62,9 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
           if (words.length === 0) {
             return _this.index();
           } else {
-            return _this.render(new Views.Study({
+            _this.render(new Views.Study({
               collection: words.shuffle()
             }));
+            return _this.trigger('change:menu', [URLS.home, URLS.add, URLS.edit]);
           }
         };
       })(this));
@@ -75,9 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return function(words) {
           if (words.length !== 0) {
             words = new Words(words);
-            return _this.render(new Views.EditWords({
+            _this.render(new Views.EditWords({
               collection: words
             }));
+            return _this.trigger('change:menu', [URLS.home, URLS.add, URLS.study]);
           } else {
             return Messenger().post({
               message: "There are no words to edit",

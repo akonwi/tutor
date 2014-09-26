@@ -29,10 +29,10 @@ window.Emitter =
       if not toKeep.length then delete @events[name] else @events[name] = toKeep
     this
 
-  trigger: (event) ->
+  trigger: (event, params) ->
     return if not @events?[event]
     for {callback, context} in @events[event]
-      callback.call context, this
+      callback.call context, params
     this
 
   listenTo: (obj, name, callback, context=this) ->

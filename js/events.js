@@ -53,7 +53,7 @@ window.Emitter = {
     }
     return this;
   },
-  trigger: function(event) {
+  trigger: function(event, params) {
     var callback, context, _i, _len, _ref, _ref1, _ref2;
     if (!((_ref = this.events) != null ? _ref[event] : void 0)) {
       return;
@@ -61,7 +61,7 @@ window.Emitter = {
     _ref1 = this.events[event];
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       _ref2 = _ref1[_i], callback = _ref2.callback, context = _ref2.context;
-      callback.call(context, this);
+      callback.call(context, params);
     }
     return this;
   },
