@@ -18,18 +18,18 @@ UrlBtn = React.createClass
   mixins: [Navigation]
   onClick: (e) -> @go @props.url
   render: ->
-    {button} = _
+    {button} = DOM
     button onClick: @onClick, @props.text
 
 Views.Home = React.createClass
   render: ->
-    {div, h1, h2, li, ul} = _
+    {div, h1, h2, li, ul} = DOM
     div {},
       div className: 'text-center',
         h1 'Tutor'
         h2 "Let's Study!"
       div {},
-        ul className: 'unstyled',
+        ul className: 'unstyled vertical text-center',
           li(UrlBtn url: 'preStudy', text: 'Study')
           li(UrlBtn url: 'addWords', text: 'Add words')
           li(UrlBtn url: 'editWords', text: 'Edit words')
@@ -66,7 +66,7 @@ Views.AddWords = React.createClass
         definitionInput.value = ''
 
   render: ->
-    {div, h2, select, option, form, input} = _
+    {div, h2, select, option, form, input} = DOM
     div className: 'text-center',
       h2 'Add Words'
       form id: 'stacked',
@@ -81,11 +81,11 @@ Views.AddWords = React.createClass
 
 Views.PreStudy = React.createClass
   render: ->
-    {div, h2, h3, ul, li} = _
+    {div, h2, h3, ul, li} = DOM
     div className: 'text-center',
       h2 'Study'
       h3 'Study by type'
-      ul className: 'unstyled',
+      ul className: 'unstyled vertical',
         li(UrlBtn url: 'study/all', text: 'All')
         li(UrlBtn url: 'study/verb', text: 'Verbs')
         li(UrlBtn url: 'study/noun', text: 'Nouns')
@@ -107,12 +107,11 @@ Views.Study = React.createClass
         @setState word: @props.collection.shift()
       else
         @go 'index'
-        # Messenger.post 'No more words'
     else
       defInput.classList.add('error')
 
   render: ->
-    {div, h2, h3, form, input} = _
+    {div, h2, h3, form, input} = DOM
     div className: 'text-center',
       h2 'Study'
       h3 @capitalize(@state.word.get('id'))
@@ -140,7 +139,7 @@ EditWordForm = React.createClass
     @setState hidden: true
 
   render: ->
-    {div, h3, form, input} = _
+    {div, h3, form, input} = DOM
     word = @props.word
     classes = cx('hidden': @state.hidden)
     div className: classes,
@@ -152,7 +151,7 @@ EditWordForm = React.createClass
 
 Views.EditWords = React.createClass
   render: ->
-    {div, h2} = _
+    {div, h2} = DOM
     forms = []
     @props.collection.each (word) ->
       forms.push new EditWordForm(word: word)
@@ -161,15 +160,13 @@ Views.EditWords = React.createClass
       forms
 
 Views.NavBar = React.createClass
-  getInitialState: -> {urls: [], count: 0}
+  getInitialState: -> {urls: []}
   render: ->
     @props.app.on 'change:menu', (urls) =>
-      count = @state.count + 1
-      console.log "called #{count}"
-      @setState(urls: urls, count: count)
-    {ul, li} = _
+      @setState(urls: urls)
+    {ul, li} = DOM
     buttons = {}
     for {route, text} in @state.urls
-      buttons[route] = new UrlBtn(url: route, text: text)
-    ul null, buttons
+      buttons[route] = li(null, new UrlBtn(url: route, text: text))
+    ul className: 'unstyled', buttons
 

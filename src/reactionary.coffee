@@ -1,4 +1,4 @@
-{DOM} = React
+rdom = React.DOM
 
 tag = (name, args...) ->
   if args[0]?.constructor is Object
@@ -6,8 +6,8 @@ tag = (name, args...) ->
   else
     attributes = {}
 
-  DOM[name](attributes, args...)
+  rdom[name](attributes, args...)
 
-window._ = {}
-for tagName of DOM
-  do (tagName) -> window._[tagName] = tag.bind(@, tagName)
+window.DOM = {}
+for tagName of rdom
+  do (tagName) -> window.DOM[tagName] = tag.bind(@, tagName)

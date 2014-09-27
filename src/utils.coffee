@@ -3,7 +3,7 @@
 # keep track of ids
 idCount = 0
 
-window.$ =
+window._ =
   # very shallow merge of objects
   # actually extends classes
   extend: (source, ext) ->

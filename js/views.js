@@ -23,7 +23,7 @@ UrlBtn = React.createClass({
   },
   render: function() {
     var button;
-    button = _.button;
+    button = DOM.button;
     return button({
       onClick: this.onClick
     }, this.props.text);
@@ -33,11 +33,11 @@ UrlBtn = React.createClass({
 Views.Home = React.createClass({
   render: function() {
     var div, h1, h2, li, ul;
-    div = _.div, h1 = _.h1, h2 = _.h2, li = _.li, ul = _.ul;
+    div = DOM.div, h1 = DOM.h1, h2 = DOM.h2, li = DOM.li, ul = DOM.ul;
     return div({}, div({
       className: 'text-center'
     }, h1('Tutor'), h2("Let's Study!")), div({}, ul({
-      className: 'unstyled'
+      className: 'unstyled vertical text-center'
     }, li(UrlBtn({
       url: 'preStudy',
       text: 'Study'
@@ -91,7 +91,7 @@ Views.AddWords = React.createClass({
   },
   render: function() {
     var div, form, h2, input, option, select;
-    div = _.div, h2 = _.h2, select = _.select, option = _.option, form = _.form, input = _.input;
+    div = DOM.div, h2 = DOM.h2, select = DOM.select, option = DOM.option, form = DOM.form, input = DOM.input;
     return div({
       className: 'text-center'
     }, h2('Add Words'), form({
@@ -128,11 +128,11 @@ Views.AddWords = React.createClass({
 Views.PreStudy = React.createClass({
   render: function() {
     var div, h2, h3, li, ul;
-    div = _.div, h2 = _.h2, h3 = _.h3, ul = _.ul, li = _.li;
+    div = DOM.div, h2 = DOM.h2, h3 = DOM.h3, ul = DOM.ul, li = DOM.li;
     return div({
       className: 'text-center'
     }, h2('Study'), h3('Study by type'), ul({
-      className: 'unstyled'
+      className: 'unstyled vertical'
     }, li(UrlBtn({
       url: 'study/all',
       text: 'All'
@@ -184,7 +184,7 @@ Views.Study = React.createClass({
   },
   render: function() {
     var div, form, h2, h3, input;
-    div = _.div, h2 = _.h2, h3 = _.h3, form = _.form, input = _.input;
+    div = DOM.div, h2 = DOM.h2, h3 = DOM.h3, form = DOM.form, input = DOM.input;
     return div({
       className: 'text-center'
     }, h2('Study'), h3(this.capitalize(this.state.word.get('id'))), form({
@@ -231,7 +231,7 @@ EditWordForm = React.createClass({
   },
   render: function() {
     var classes, div, form, h3, input, word;
-    div = _.div, h3 = _.h3, form = _.form, input = _.input;
+    div = DOM.div, h3 = DOM.h3, form = DOM.form, input = DOM.input;
     word = this.props.word;
     classes = cx({
       'hidden': this.state.hidden
@@ -261,7 +261,7 @@ EditWordForm = React.createClass({
 Views.EditWords = React.createClass({
   render: function() {
     var div, forms, h2;
-    div = _.div, h2 = _.h2;
+    div = DOM.div, h2 = DOM.h2;
     forms = [];
     this.props.collection.each(function(word) {
       return forms.push(new EditWordForm({
@@ -277,33 +277,30 @@ Views.EditWords = React.createClass({
 Views.NavBar = React.createClass({
   getInitialState: function() {
     return {
-      urls: [],
-      count: 0
+      urls: []
     };
   },
   render: function() {
     var buttons, li, route, text, ul, _i, _len, _ref, _ref1;
     this.props.app.on('change:menu', (function(_this) {
       return function(urls) {
-        var count;
-        count = _this.state.count + 1;
-        console.log("called " + count);
         return _this.setState({
-          urls: urls,
-          count: count
+          urls: urls
         });
       };
     })(this));
-    ul = _.ul, li = _.li;
+    ul = DOM.ul, li = DOM.li;
     buttons = {};
     _ref = this.state.urls;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       _ref1 = _ref[_i], route = _ref1.route, text = _ref1.text;
-      buttons[route] = new UrlBtn({
+      buttons[route] = li(null, new UrlBtn({
         url: route,
         text: text
-      });
+      }));
     }
-    return ul(null, buttons);
+    return ul({
+      className: 'unstyled'
+    }, buttons);
   }
 });

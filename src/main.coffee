@@ -1,8 +1,4 @@
 document.addEventListener 'DOMContentLoaded', ->
-  Messenger.options =
-    extraClasses: 'messenger-fixed messenger-on-top'
-    theme: 'ice'
-
   # easy reference url objects for the menu
   URLS =
     home:
@@ -23,7 +19,7 @@ document.addEventListener 'DOMContentLoaded', ->
     nav: document.getElementsByTagName('nav')[0]
 
     initialize: ->
-      $.extend(this, Emitter)
+      _.extend(this, Emitter)
       @set 'db', new Store
       @get('db').all (items) =>
         collection = new Words(items)
@@ -64,8 +60,5 @@ document.addEventListener 'DOMContentLoaded', ->
           @render new Views.EditWords(collection: words)
           @trigger 'change:menu', [URLS.home, URLS.add, URLS.study]
         else
-          Messenger().post
-            message: "There are no words to edit"
-            type: ''
 
   window.Tutor = new App().start()

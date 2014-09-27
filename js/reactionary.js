@@ -1,7 +1,7 @@
-var DOM, tag, tagName, _fn,
+var rdom, tag, tagName, _fn,
   __slice = [].slice;
 
-DOM = React.DOM;
+rdom = React.DOM;
 
 tag = function() {
   var args, attributes, name, _ref;
@@ -11,14 +11,14 @@ tag = function() {
   } else {
     attributes = {};
   }
-  return DOM[name].apply(DOM, [attributes].concat(__slice.call(args)));
+  return rdom[name].apply(rdom, [attributes].concat(__slice.call(args)));
 };
 
-window._ = {};
+window.DOM = {};
 
 _fn = function(tagName) {
-  return window._[tagName] = tag.bind(this, tagName);
+  return window.DOM[tagName] = tag.bind(this, tagName);
 };
-for (tagName in DOM) {
+for (tagName in rdom) {
   _fn(tagName);
 }

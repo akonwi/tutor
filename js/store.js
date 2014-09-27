@@ -27,7 +27,7 @@ window.Store = Store = (function() {
 
   Store.prototype.get = function(key, func) {
     return storage.get(key, function(results) {
-      return func.call(this, $.toArray(results));
+      return func.call(this, _.toArray(results));
     });
   };
 
@@ -39,7 +39,7 @@ window.Store = Store = (function() {
 
   Store.prototype.all = function(func) {
     return storage.get(null, function(items) {
-      return func.call(this, $.toArray(items));
+      return func.call(this, _.toArray(items));
     });
   };
 

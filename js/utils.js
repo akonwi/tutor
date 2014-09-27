@@ -2,7 +2,7 @@ var idCount;
 
 idCount = 0;
 
-window.$ = {
+window._ = {
   extend: function(source, ext) {
     var k, v;
     if (!!source.constructor.prototype) {

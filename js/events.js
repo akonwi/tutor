@@ -71,7 +71,7 @@ window.Emitter = {
       context = this;
     }
     this.listeningTo = this.listeningTo || {};
-    id = obj.listenId = $.uniqueId('l');
+    id = obj.listenId = _.uniqueId('l');
     this.listeningTo[id] = obj;
     return obj.on(name, callback, context);
   },
@@ -81,7 +81,7 @@ window.Emitter = {
       context = this;
     }
     this.listeningTo = this.listeningTo || {};
-    id = obj.listenId = $.uniqueId('l');
+    id = obj.listenId = _.uniqueId('l');
     this.listeningTo[id] = obj;
     return obj.once(name, callback, context);
   }

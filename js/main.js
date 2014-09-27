@@ -3,10 +3,6 @@ var __hasProp = {}.hasOwnProperty,
 
 document.addEventListener('DOMContentLoaded', function() {
   var App, URLS;
-  Messenger.options = {
-    extraClasses: 'messenger-fixed messenger-on-top',
-    theme: 'ice'
-  };
   URLS = {
     home: {
       route: 'index',
@@ -37,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     App.prototype.nav = document.getElementsByTagName('nav')[0];
 
     App.prototype.initialize = function() {
-      $.extend(this, Emitter);
+      _.extend(this, Emitter);
       this.set('db', new Store);
       this.get('db').all((function(_this) {
         return function(items) {
@@ -104,10 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }));
             return _this.trigger('change:menu', [URLS.home, URLS.add, URLS.study]);
           } else {
-            return Messenger().post({
-              message: "There are no words to edit",
-              type: ''
-            });
+
           }
         };
       })(this));

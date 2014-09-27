@@ -5,7 +5,7 @@ window.Word = Word = (function() {
     this.attributes = attributes != null ? attributes : {
       id: null
     };
-    $.extend(this, Emitter);
+    _.extend(this, Emitter);
   }
 
   Word.prototype.set = function(attr, val) {
@@ -42,11 +42,11 @@ window.Word = Word = (function() {
   };
 
   Word.prototype.clone = function() {
-    return new this.constructor($.clone(this.attributes));
+    return new this.constructor(_.clone(this.attributes));
   };
 
   Word.prototype.toJSON = function() {
-    return $.clone(this.attributes);
+    return _.clone(this.attributes);
   };
 
   Word.prototype.save = function(attrs, _arg) {
@@ -87,7 +87,7 @@ window.Words = Words = (function() {
     if (collection == null) {
       collection = [];
     }
-    $.extend(this, Emitter);
+    _.extend(this, Emitter);
     this.collection = [];
     for (_i = 0, _len = collection.length; _i < _len; _i++) {
       word = collection[_i];
@@ -191,7 +191,7 @@ window.Words = Words = (function() {
   };
 
   Words.prototype.shuffle = function() {
-    this.collection = $.shuffle(this.collection);
+    this.collection = _.shuffle(this.collection);
     return this;
   };
 
