@@ -43,14 +43,6 @@ body
 .text-center
   text-align: center
 
-.green
-  background: $green !important
-  color: white !important
-
-.red
-  background: $red !important
-  color: white !important
-
 /* Element Globals */
 h3, h2, h1
   margin: 0
@@ -65,6 +57,13 @@ nav
     display: -webkit-inline-box
     float: right
     margin: .5rem
+    button
+      position: relative
+      box-shadow: 0rem .3rem .7rem -.3rem black
+      &:active
+        position: relative
+        top: .3rem
+        box-shadow: none
 
 /* Flat buttons */
 button, input[type="submit"]
@@ -79,11 +78,14 @@ button, input[type="submit"]
   cursor: pointer
   &:hover
     background: $grey
+  &.red
+    background: $red
+    color: white
+  &.green
+    background: $green
+    color: white
 
 /* Specific Elements */
-#container
-  height: 100%
-
 .unstyled
   list-style-type: none
   padding: 0
@@ -94,13 +96,8 @@ button, input[type="submit"]
   display: block
   margin: 1rem
 
-.error
-  border: .1rem solid $red !important
-  &:focus
-    outline: none !important
-    box-shadow: none //0 0 1rem #e74c3c
-
 #container
+  height: 100%
   width: 60%
   display: block
   margin: 0 auto 0 auto
@@ -123,3 +120,9 @@ button, input[type="submit"]
   input[type="text"]
     padding: .4rem .8rem
     border-radius: .8rem
+    &.error
+      border: .1rem solid $red
+      &:focus
+        outline: none
+        box-shadow: none //0 0 1rem #e74c3c
+
