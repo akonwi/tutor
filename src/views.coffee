@@ -106,6 +106,7 @@ Views.Study = React.createClass
       if @props.collection.hasNext()
         @setState word: @props.collection.shift()
       else
+        Tutor.trigger 'message', 'No more words'
         @go 'index'
     else
       defInput.classList.add('error')
@@ -159,6 +160,12 @@ Views.EditWords = React.createClass
       h2 'Edit'
       forms
 
+# Menu with navigation buttons
+# Listens for 'change:menu' event triggered by app
+# Trigger should also pass an array of objects with
+#   'route' and 'text' keys
+#
+# @props app application instance to subscribe to
 Views.NavBar = React.createClass
   getInitialState: -> {urls: []}
   render: ->
@@ -170,3 +177,20 @@ Views.NavBar = React.createClass
       buttons[route] = li(null, new UrlBtn(url: route, text: text))
     ul className: 'unstyled', buttons
 
+# Basic notification component
+# Listens for 'message' event triggered by app
+# Trigger should also pass a string to be displayed
+# Disappears after 5 seconds
+#
+# @props app application instance to subscribe to
+Views.Message = React.createClass
+  getInitialState: -> { message: '' }
+  render: ->
+    @props.app.on 'message', (text) =>
+      @setState message: text
+    {div} = DOM
+    classes = if @state.message.trim().length is 0 then 'hidden' else ''
+    if classes is ''
+      clearMe = => @setState message: ''
+      setTimeout(clearMe, 5000)
+    div id: 'message', className: classes, @state.message

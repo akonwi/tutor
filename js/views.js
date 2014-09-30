@@ -176,6 +176,7 @@ Views.Study = React.createClass({
           word: this.props.collection.shift()
         });
       } else {
+        Tutor.trigger('message', 'No more words');
         return this.go('index');
       }
     } else {
@@ -302,5 +303,39 @@ Views.NavBar = React.createClass({
     return ul({
       className: 'unstyled'
     }, buttons);
+  }
+});
+
+Views.Message = React.createClass({
+  getInitialState: function() {
+    return {
+      message: ''
+    };
+  },
+  render: function() {
+    var classes, clearMe, div;
+    this.props.app.on('message', (function(_this) {
+      return function(text) {
+        return _this.setState({
+          message: text
+        });
+      };
+    })(this));
+    div = DOM.div;
+    classes = this.state.message.trim().length === 0 ? 'hidden' : '';
+    if (classes === '') {
+      clearMe = (function(_this) {
+        return function() {
+          return _this.setState({
+            message: ''
+          });
+        };
+      })(this);
+      setTimeout(clearMe, 5000);
+    }
+    return div({
+      id: 'message',
+      className: classes
+    }, this.state.message);
   }
 });

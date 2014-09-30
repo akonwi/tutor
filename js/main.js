@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     App.prototype.nav = document.getElementsByTagName('nav')[0];
 
+    App.prototype.messageBox = document.getElementById('message-box');
+
     App.prototype.initialize = function() {
       _.extend(this, Emitter);
       this.set('db', new Store);
@@ -45,9 +47,12 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         };
       })(this));
-      return React.renderComponent(new Views.NavBar({
+      React.renderComponent(new Views.NavBar({
         app: this
       }), this.nav);
+      return React.renderComponent(new Views.Message({
+        app: this
+      }), this.messageBox);
     };
 
     App.prototype.render = function(component) {
@@ -79,7 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
           }
           if (words.length === 0) {
-            return _this.index();
+            _this.index();
+            return _this.trigger('message', 'No words to study');
           } else {
             _this.render(new Views.Study({
               collection: words.shuffle()

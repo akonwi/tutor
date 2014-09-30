@@ -17,6 +17,7 @@ document.addEventListener 'DOMContentLoaded', ->
   class App extends Router
     container: document.getElementById('container')
     nav: document.getElementsByTagName('nav')[0]
+    messageBox: document.getElementById('message-box')
 
     initialize: ->
       _.extend(this, Emitter)
@@ -27,6 +28,7 @@ document.addEventListener 'DOMContentLoaded', ->
         collection.on 'change', (newCollection) =>
           @set 'words', newCollection
       React.renderComponent(new Views.NavBar(app: this), @nav)
+      React.renderComponent(new Views.Message(app: this), @messageBox)
 
     render: (component) -> React.renderComponent(component, @container)
 
@@ -49,6 +51,7 @@ document.addEventListener 'DOMContentLoaded', ->
           words = words.where type: type
         if words.length is 0
           @index()
+          @trigger 'message', 'No words to study'
         else
           @render new Views.Study(collection: words.shuffle())
           @trigger 'change:menu', [URLS.home, URLS.add, URLS.edit]
