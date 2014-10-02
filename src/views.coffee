@@ -142,7 +142,7 @@ EditWordForm = React.createClass
   render: ->
     {div, h3, form, input} = DOM
     word = @props.word
-    classes = cx('hidden': @state.hidden)
+    classes = cx('hidden': @state.hidden, 'edit-word': true)
     div className: classes,
       h3 @capitalize(word.get('id'))
       form id: 'stacked',

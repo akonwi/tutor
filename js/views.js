@@ -235,7 +235,8 @@ EditWordForm = React.createClass({
     div = DOM.div, h3 = DOM.h3, form = DOM.form, input = DOM.input;
     word = this.props.word;
     classes = cx({
-      'hidden': this.state.hidden
+      'hidden': this.state.hidden,
+      'edit-word': true
     });
     return div({
       className: classes
