@@ -21,7 +21,7 @@ document.addEventListener 'DOMContentLoaded', ->
 
     initialize: ->
       _.extend(this, Emitter)
-      @set 'db', new Store
+      @set 'db', new Closet('words')
       @get('db').all (items) =>
         collection = new Words(items)
         @set 'words', collection

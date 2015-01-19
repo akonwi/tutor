@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     App.prototype.initialize = function() {
       _.extend(this, Emitter);
-      this.set('db', new Store);
+      this.set('db', new Closet('words'));
       this.get('db').all((function(_this) {
         return function(items) {
           var collection;
